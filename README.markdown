@@ -14,7 +14,15 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 
 ## Install
 
-* gem install redis-search
+in Rails application Gemfile
+
+		gem 'redis-rb','2.1.1'
+		gem "rmmseg-cpp-huacnlee", "0.2.8"
+		gem 'redis-search', '0.1'
+
+install bundlers
+
+		$ bundle install
 
 ## Configure
 
