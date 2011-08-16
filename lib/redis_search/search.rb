@@ -1,5 +1,5 @@
 # coding: utf-8
-require "mmseg"
+require "rmmseg"
 module RedisSearch  
   class Search
     attr_accessor :type, :title, :id, :exts
