@@ -14,6 +14,6 @@ Gem::Specification.new do |s|
   s.add_dependency("rmmseg-cpp-huacnlee", ["~> 0.2.8"])
   s.add_dependency("redis", ["~> 2.1.1"])
 
-  s.files        = Dir.glob("lib/**/*") + %w(README.markdown)
+  s.files        = Dir.glob("lib/**/*") + %w(README.textile)
   s.require_path = 'lib'
 end
