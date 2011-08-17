@@ -100,7 +100,8 @@ module RedisSearch
       limit = options[:limit] || 10 
 
       prefix_matchs = []
-      rangelen = 100 # This is not random, try to get replies < MTU size
+      # This is not random, try to get replies < MTU size
+      rangelen = RedisSearch.config.complete_max_length
       prefix = w.downcase
       key = Search.mk_complete_key(type)
       
