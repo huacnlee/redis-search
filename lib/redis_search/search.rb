@@ -142,7 +142,18 @@ module RedisSearch
       sort_field = options[:sort_field] || "id"
       words = words.collect { |w| Search.mk_sets_key(type,w) }
       return result if words.blank?
-      ids = RedisSearch.config.redis.sinter(*words)
+      temp_store_key = "tmpinterstore:#{words.join("+")}"
+      if words.length > 1
+        # 将多个词语组合对比，得到交集，并存入临时区域
+        RedisSearch.config.redis.sinterstore(temp_store_key,*words)
+        # 将临时搜索设为30秒后自动清除
+        RedisSearch.config.redis.expire(temp_store_key,30)
+        # 根据需要的数量取出 ids
+        ids = RedisSearch.config.redis.sort(temp_store_key,:limit => [0,limit])
+      else
+        # 根据需要的数量取出 ids
+        ids = RedisSearch.config.redis.sort(words.first,:limit => [0,limit])
+      end
       hmget(type,ids, :limit => limit, :sort_field => sort_field)
     end
   
@@ -152,6 +163,7 @@ module RedisSearch
         limit = options[:limit] || 10
         sort_field = options[:sort_field] || "id"
         return result if ids.blank?
+        # ids = ids[0..limit] if ids.length > limit
         RedisSearch.config.redis.hmget(type,*ids).each do |r|
           begin
             result << JSON.parse(r)
@@ -159,15 +171,7 @@ module RedisSearch
             Search.warn("Search.query failed: #{e}")
           end
         end
-        items = sort_result(result, type, sort_field)
-        items = items[0..limit-1] if items.length > limit
-        items
-      end
-  
-      def self.sort_result(items, type, sort_field)
-        return items if items.blank?
-        items = items.sort { |x,y| y[sort_field] <=> x[sort_field] }
-        items
+        result
       end
   end
 end
