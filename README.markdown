@@ -30,7 +30,8 @@ create file in: config/initializers/redis_search.rb
 
     require "redis_search"
     redis = Redis.new(:host => "127.0.0.1",:port => "6379")
-    redis.select("app_name.search")
+		# change redis database to 3
+    redis.select(3)
     RedisSearch.configure do |config|
      config.redis = redis
     end

@@ -2,7 +2,7 @@
 require "rmmseg"
 module RedisSearch  
   class Search
-    attr_accessor :type, :title, :id, :exts
+    attr_accessor :type, :title, :id, :exts, :prefix_index_enable
     def initialize(options = {})
       self.exts = []
       options.keys.each do |k|
@@ -52,15 +52,19 @@ module RedisSearch
       return if words.blank?
       words.each do |word|
         next if not Search.word?(word)
-        save_zindex(word)
         key = Search.mk_sets_key(self.type,word)
         RedisSearch.config.redis.sadd(key, self.id)
       end
+      
+      # 建立前最索引
+      if prefix_index_enable
+        save_prefix_index(self.title)
+      end
     end
   
-    def save_zindex(word)
-      return if not Search.word?(word)
-      word = word.downcase
+    def save_prefix_index(title)
+      return if not Search.word?(title)
+      word = title.downcase
       key = Search.mk_complete_key(self.type)
       (1..(word.length)).each do |l|
         prefix = word[0...l]
@@ -99,12 +103,13 @@ module RedisSearch
       rangelen = 100 # This is not random, try to get replies < MTU size
       prefix = w.downcase
       key = Search.mk_complete_key(type)
+      
       start = RedisSearch.config.redis.zrank(key,prefix)
-
       return [] if !start
       count = limit
+      max_range = start+(rangelen*limit)-1
+      range = RedisSearch.config.redis.zrange(key,start,max_range)
       while prefix_matchs.length <= count
-        range = RedisSearch.config.redis.zrange(key,start,start+rangelen-1)
         start += rangelen
         break if !range or range.length == 0
         range.each {|entry|
@@ -117,12 +122,25 @@ module RedisSearch
             prefix_matchs << entry[0...-1]
           end
         }
+        range = range[start..max_range]
       end
       words = []
       words = prefix_matchs.uniq.collect { |w| Search.mk_sets_key(type,w) }
-      ids = RedisSearch.config.redis.sunion(*words)
+      if words.length > 1
+        temp_store_key = "tmpsunionstore:#{words.join("+")}"   
+        if !RedisSearch.config.redis.exists(temp_store_key)
+          # 将多个词语组合对比，得到并集，并存入临时区域   
+          RedisSearch.config.redis.sunionstore(temp_store_key,*words)
+          # 将临时搜索设为1天后自动清除
+          RedisSearch.config.redis.expire(temp_store_key,86400)
+        end
+        # 根据需要的数量取出 ids
+        ids = RedisSearch.config.redis.sort(temp_store_key,:limit => [0,limit])
+      else
+        ids = RedisSearch.config.redis.sort(words.first,:limit => [0,limit])
+      end
       return [] if ids.blank?
-      hmget(type,ids, :limit => limit)
+      hmget(type,ids)
     end
 
     # Search items, this will split words by Libmmseg
@@ -144,26 +162,26 @@ module RedisSearch
       return result if words.blank?
       temp_store_key = "tmpinterstore:#{words.join("+")}"
       if words.length > 1
-        # 将多个词语组合对比，得到交集，并存入临时区域
-        RedisSearch.config.redis.sinterstore(temp_store_key,*words)
-        # 将临时搜索设为30秒后自动清除
-        RedisSearch.config.redis.expire(temp_store_key,30)
+        if !RedisSearch.config.redis.exists(temp_store_key)
+          # 将多个词语组合对比，得到交集，并存入临时区域
+          RedisSearch.config.redis.sinterstore(temp_store_key,*words)
+          # 将临时搜索设为1天后自动清除
+          RedisSearch.config.redis.expire(temp_store_key,86400)
+        end
         # 根据需要的数量取出 ids
         ids = RedisSearch.config.redis.sort(temp_store_key,:limit => [0,limit])
       else
         # 根据需要的数量取出 ids
         ids = RedisSearch.config.redis.sort(words.first,:limit => [0,limit])
       end
-      hmget(type,ids, :limit => limit, :sort_field => sort_field)
+      hmget(type,ids, :sort_field => sort_field)
     end
   
     private
       def self.hmget(type, ids, options = {})
         result = []
-        limit = options[:limit] || 10
         sort_field = options[:sort_field] || "id"
         return result if ids.blank?
-        # ids = ids[0..limit] if ids.length > limit
         RedisSearch.config.redis.hmget(type,*ids).each do |r|
           begin
             result << JSON.parse(r)

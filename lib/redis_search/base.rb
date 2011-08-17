@@ -4,6 +4,7 @@ module RedisSearch
   module ClassMethods
     def redis_search_index(options = {})
       title_field = options[:title_field] || :title
+      prefix_index_enable = options[:prefix_index_enable] || false
       ext_fields = options[:ext_fields] || []
       class_eval %(
         def redis_search_ext_fields(ext_fields)
@@ -18,8 +19,11 @@ module RedisSearch
         def redis_search_index_create
           s = Search.new(:title => self.#{title_field}, :id => self.id, 
                           :exts => self.redis_search_ext_fields(#{ext_fields}), 
-                          :type => self.class.to_s)
+                          :type => self.class.to_s,
+                          :prefix_index_enable => #{prefix_index_enable})
           s.save
+          # release s
+          s = nil
         end
 
         before_destroy :redis_search_index_remove
