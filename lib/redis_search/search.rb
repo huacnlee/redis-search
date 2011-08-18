@@ -63,7 +63,6 @@ module RedisSearch
     end
   
     def save_prefix_index
-      return if not Search.word?(self.title)
       word = self.title.downcase
       RedisSearch.config.redis.sadd(Search.mk_sets_key(self.type,self.title), self.id)
       key = Search.mk_complete_key(self.type)
@@ -75,7 +74,6 @@ module RedisSearch
     end
 
     def self.remove(options = {})
-      puts options.inspect
       type = options[:type]
       RedisSearch.config.redis.hdel(type,options[:id])
       words = Search.split(options[:title])
@@ -120,7 +118,6 @@ module RedisSearch
             count = prefix_matchs.count
             break
           end
-          # puts entry
           if entry[-1..-1] == "*" and prefix_matchs.length != count
             prefix_matchs << entry[0...-1]
           end
