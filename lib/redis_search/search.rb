@@ -58,13 +58,14 @@ module RedisSearch
       
       # 建立前最索引
       if prefix_index_enable
-        save_prefix_index(self.title)
+        save_prefix_index
       end
     end
   
-    def save_prefix_index(title)
-      return if not Search.word?(title)
-      word = title.downcase
+    def save_prefix_index
+      return if not Search.word?(self.title)
+      word = self.title.downcase
+      RedisSearch.config.redis.sadd(Search.mk_sets_key(self.type,self.title), self.id)
       key = Search.mk_complete_key(self.type)
       (1..(word.length)).each do |l|
         prefix = word[0...l]
@@ -119,6 +120,7 @@ module RedisSearch
             count = prefix_matchs.count
             break
           end
+          # puts entry
           if entry[-1..-1] == "*" and prefix_matchs.length != count
             prefix_matchs << entry[0...-1]
           end
