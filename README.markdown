@@ -19,7 +19,7 @@ in Rails application Gemfile
 
 	gem 'redis','2.1.1'
 	gem "rmmseg-cpp-huacnlee", "0.2.8"
-	gem 'redis-search', '0.3'
+	gem 'redis-search', '0.4'
 
 install bundlers
 
@@ -86,6 +86,8 @@ bind Redis::Search callback event, it will to rebuild search indexes when data c
     end
 
 ## Index data to Redis
+
+If you are first install it in you old project, or your Redis cache lose, you can use this command to rebuild indexes.
 
     $ rake redis_search:index
 
