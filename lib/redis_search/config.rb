@@ -1,3 +1,4 @@
+# coding: utf-8
 module RedisSearch
   class << self
     attr_accessor :config

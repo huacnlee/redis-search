@@ -1,3 +1,4 @@
+# coding: utf-8
 module RedisSearch
   extend ActiveSupport::Concern
 
@@ -17,10 +18,11 @@ module RedisSearch
 
         after_create :redis_search_index_create
         def redis_search_index_create
-          s = Search.new(:title => self.#{title_field}, :id => self.id, 
-                          :exts => self.redis_search_ext_fields(#{ext_fields}), 
-                          :type => self.class.to_s,
-                          :prefix_index_enable => #{prefix_index_enable})
+          s = Search.new(:title => self.#{title_field}, 
+                         :id => self.id, 
+                         :exts => self.redis_search_ext_fields(#{ext_fields.inspect}), 
+                         :type => self.class.to_s,
+                         :prefix_index_enable => #{prefix_index_enable})
           s.save
           # release s
           s = nil
@@ -34,7 +36,7 @@ module RedisSearch
         before_update :redis_search_index_update
         def redis_search_index_update
           index_fields_changed = false
-          #{ext_fields}.each do |f|
+          #{ext_fields.inspect}.each do |f|
             next if f.to_s == "id"
             if instance_eval(f.to_s + "_changed?")
               index_fields_changed = true

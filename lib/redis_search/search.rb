@@ -33,10 +33,6 @@ module RedisSearch
     def self.mk_complete_key(type)
       "Compl#{type}"
     end
-  
-    def self.word?(word)
-      return !/^[\w\u4e00-\u9fa5]+$/i.match(word.force_encoding("UTF-8")).blank?
-    end
 
     def save
       return if self.title.blank?
@@ -51,7 +47,6 @@ module RedisSearch
       words = Search.split(self.title)
       return if words.blank?
       words.each do |word|
-        next if not Search.word?(word)
         key = Search.mk_sets_key(self.type,word)
         RedisSearch.config.redis.sadd(key, self.id)
       end
@@ -78,7 +73,6 @@ module RedisSearch
       RedisSearch.config.redis.hdel(type,options[:id])
       words = Search.split(options[:title])
       words.each do |word|
-        next if not Search.word?(word)
         key = Search.mk_sets_key(type,word)
         RedisSearch.config.redis.srem(key, options[:id])
       end

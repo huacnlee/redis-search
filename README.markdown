@@ -11,7 +11,6 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 
 ## Requirements
 
-* Ruby 1.9.2
 * Redis 2.2+
 
 ## Install
@@ -77,12 +76,12 @@ bind RedisSearch callback event, it will to rebuild search indexes when data cre
     class SearchController < ApplicationController
       # GET /searchs?q=title
       def index
-        RedisSearch::Search.query(params[:q], :type => "Post")
+        RedisSearch::Search.query("Post", params[:q])
       end
       
       # GET /search_users?q=j
       def search_users
-        RedisSearch::Search.complete(params[:q], :type => "Post")
+        RedisSearch::Search.complete("Post", params[:q])
       end
     end
 
