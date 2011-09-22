@@ -7,6 +7,11 @@ module RedisSearch
       title_field = options[:title_field] || :title
       prefix_index_enable = options[:prefix_index_enable] || false
       ext_fields = options[:ext_fields] || []
+      
+      # store Model name to indexed_models for Rake tasks
+      Search.indexed_models = [] if Search.indexed_models == nil
+      Search.indexed_models << self
+      # bind instance methods and callback events
       class_eval %(
         def redis_search_ext_fields(ext_fields)
           exts = {}

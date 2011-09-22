@@ -1,0 +1,1 @@
+require "redis_search"

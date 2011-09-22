@@ -2,6 +2,10 @@
 require "rmmseg"
 module RedisSearch  
   class Search
+    class << self
+      attr_accessor :indexed_models
+    end
+    
     attr_accessor :type, :title, :id, :exts, :prefix_index_enable
     def initialize(options = {})
       self.exts = []
