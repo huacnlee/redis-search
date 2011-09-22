@@ -1,6 +1,7 @@
 # coding: utf-8
+require "redis-search"
 namespace :redis_search do
-  desc "RedisSearch index data to Redis"
+  desc "Redis-Search index data to Redis"
   task :index => :environment do
     tm = Time.now
     count = 0
@@ -8,7 +9,7 @@ namespace :redis_search do
     puts "-"*120
     puts "Now indexing search to Redis...".rjust(120)
     puts ""
-    RedisSearch::Search.indexed_models.each do |klass|
+    Redis::Search.indexed_models.each do |klass|
       print "[#{klass.to_s}]"
       klass.find_in_batches(:batch_size => 1000) do |items|
         items.each do |item|

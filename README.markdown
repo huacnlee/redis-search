@@ -1,4 +1,4 @@
-# RedisSearch
+# Redis-Search
 
 High performance real-time search (Support Chinese), index in Redis for Rails application
 
@@ -29,22 +29,22 @@ install bundlers
 
 create file in: config/initializers/redis_search.rb
 
-    require "redis_search"
+    require "redis-search"
     redis = Redis.new(:host => "127.0.0.1",:port => "6379")
     # change redis database to 3, you need use a special database for search feature.
     redis.select(3)
-    RedisSearch.configure do |config|
+    Redis::Search.configure do |config|
       config.redis = redis
       config.complete_max_length = 100
     end
 
 ## Usage
 
-bind RedisSearch callback event, it will to rebuild search indexes when data create or update.
+bind Redis::Search callback event, it will to rebuild search indexes when data create or update.
 
     class Post
       include Mongoid::Document
-      include RedisSearch
+      include Redis::Search
   
       field :title
       field :body
@@ -62,7 +62,7 @@ bind RedisSearch callback event, it will to rebuild search indexes when data cre
     
     class User
       include Mongoid::Document
-      include RedisSearch
+      include Redis::Search
       
       field :name
       field :tagline
@@ -76,14 +76,18 @@ bind RedisSearch callback event, it will to rebuild search indexes when data cre
     class SearchController < ApplicationController
       # GET /searchs?q=title
       def index
-        RedisSearch::Search.query("Post", params[:q])
+        Redis::Search.query("Post", params[:q])
       end
       
       # GET /search_users?q=j
       def search_users
-        RedisSearch::Search.complete("Post", params[:q])
+        Redis::Search.complete("Post", params[:q])
       end
     end
+
+## Index data to Redis
+
+    $ rake redis_search:index
 
 ## Benchmark test
 
