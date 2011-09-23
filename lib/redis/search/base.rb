@@ -38,9 +38,8 @@ class Redis
           def redis_search_index_remove
             Search::Index.remove(:id => self.id, :title => self.#{title_field}, :type => self.class.to_s)
           end
-
-          after_save :redis_search_index_update
-          def redis_search_index_update
+          
+          def redis_search_index_need_reindex
             index_fields_changed = false
             #{ext_fields.inspect}.each do |f|
               next if f.to_s == "id"
@@ -54,8 +53,15 @@ class Redis
               end
             rescue
             end
-            if index_fields_changed
-              Search::Index.remove(:id => self.id, :title => self.#{title_field}_was, :type => self.class.to_s)
+            return index_fields_changed
+          end
+          
+          after_update :redis_search_index_remove
+
+          after_save :redis_search_index_update
+          def redis_search_index_update
+            if self.redis_search_index_need_reindex
+              # Search::Index.remove(:id => self.id, :title => self.#{title_field}_was, :type => self.class.to_s)
               self.redis_search_index_create
             end
           end
