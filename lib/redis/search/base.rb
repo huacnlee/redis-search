@@ -22,7 +22,7 @@ class Redis
             exts
           end
 
-          after_create :redis_search_index_create
+          # after_create :redis_search_index_create
           def redis_search_index_create
             s = Search::Index.new(:title => self.#{title_field}, 
                            :id => self.id, 
@@ -41,7 +41,6 @@ class Redis
 
           after_save :redis_search_index_update
           def redis_search_index_update
-            ::Rails.logger.info "new_record: #{self.new_record?}"
             index_fields_changed = false
             #{ext_fields.inspect}.each do |f|
               next if f.to_s == "id"
