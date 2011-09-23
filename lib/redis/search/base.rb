@@ -39,7 +39,7 @@ class Redis
             Search::Index.remove(:id => self.id, :title => self.#{title_field}, :type => self.class.to_s)
           end
 
-          before_update :redis_search_index_update
+          after_update :redis_search_index_update
           def redis_search_index_update
             index_fields_changed = false
             #{ext_fields.inspect}.each do |f|
