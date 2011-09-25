@@ -7,7 +7,8 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 * Real-time search
 * High performance
 * Segment words search and prefix match search
-* Support ActiveRecord, Mongoid and others ORM
+* Support ActiveRecord and Mongoid
+* Sort results by one field
 
 ## Requirements
 
@@ -19,7 +20,7 @@ in Rails application Gemfile
 
 	gem 'redis','>= 2.1.1'
 	gem "rmmseg-cpp-huacnlee", "0.2.8"
-	gem 'redis-search', '0.4'
+	gem 'redis-search', '0.5'
 
 install bundlers
 
@@ -48,11 +49,13 @@ bind Redis::Search callback event, it will to rebuild search indexes when data c
   
       field :title
       field :body
+      field :hits
   
       belongs_to :user
       belongs_to :category
   
       redis_search_index(:title_field => :title,
+												 :score_field => :hits,
                          :ext_fields => [:category_name])
   
       def category_name
@@ -67,9 +70,11 @@ bind Redis::Search callback event, it will to rebuild search indexes when data c
       field :name
       field :tagline
       field :email
+      field :followers_count
       
       redis_search_index(:title_field => :name,
                          :prefix_index_enable => true,
+												 :score_field => :followers_count,
                          :ext_fields => [:email,:tagline])
     end
 
@@ -90,6 +95,10 @@ bind Redis::Search callback event, it will to rebuild search indexes when data c
 If you are first install it in you old project, or your Redis cache lose, you can use this command to rebuild indexes.
 
     $ rake redis_search:index
+
+## Documentation
+
+see [Rdoc.info redis-search](http://rubydoc.info/gems/redis-search)
 
 ## Benchmark test
 

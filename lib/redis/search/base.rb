@@ -4,10 +4,17 @@ class Redis
     extend ActiveSupport::Concern
 
     module ClassMethods
+      # Config redis-search index for Model
+      # == Params:
+      #   title_field   Query field for Search
+      #   prefix_index_enable   Is use prefix index search
+      #   ext_fields    What kind fields do you need inlucde to search indexes
+      #   score_field   Give a score for search sort, need Integer value, default is `created_at`
       def redis_search_index(options = {})
         title_field = options[:title_field] || :title
         prefix_index_enable = options[:prefix_index_enable] || false
         ext_fields = options[:ext_fields] || []
+        score_field = options[:score_field] || :created_at
       
         # store Model name to indexed_models for Rake tasks
         Search.indexed_models = [] if Search.indexed_models == nil
@@ -28,6 +35,7 @@ class Redis
                            :id => self.id, 
                            :exts => self.redis_search_ext_fields(#{ext_fields.inspect}), 
                            :type => self.class.to_s,
+                           :score => self.#{score_field}.to_i,
                            :prefix_index_enable => #{prefix_index_enable})
             s.save
             # release s

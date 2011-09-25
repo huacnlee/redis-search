@@ -1,7 +1,7 @@
 class Redis
   module Search
     class Index
-      attr_accessor :type, :title, :id, :exts, :prefix_index_enable
+      attr_accessor :type, :title, :id,:score, :exts, :prefix_index_enable
       def initialize(options = {})
         self.exts = []
         options.keys.each do |k|
@@ -24,6 +24,7 @@ class Redis
         words.each do |word|
           key = Search.mk_sets_key(self.type,word)
           Redis::Search.config.redis.sadd(key, self.id)
+          Redis::Search.config.redis.set(Search.mk_score_key(self.type,self.id),self.score)
         end
 
         # 建立前最索引
@@ -50,6 +51,7 @@ class Redis
         words.each do |word|
           key = Search.mk_sets_key(type,word)
           Redis::Search.config.redis.srem(key, options[:id])
+          Redis::Search.config.redis.del(Search.mk_score_key(self.type,self.id))
         end
       end
     end

@@ -21,6 +21,10 @@ class Redis
     def self.mk_sets_key(type, key)
       "#{type}:#{key.downcase}"
     end
+    
+    def self.mk_score_key(type, id)
+      "#{type}:_score_:#{id}"
+    end
   
     def self.mk_complete_key(type)
       "Compl#{type}"
@@ -77,9 +81,15 @@ class Redis
           Redis::Search.config.redis.expire(temp_store_key,86400)
         end
         # 根据需要的数量取出 ids
-        ids = Redis::Search.config.redis.sort(temp_store_key,:limit => [0,limit])
+        ids = Redis::Search.config.redis.sort(temp_store_key,
+                                              :limit => [0,limit], 
+                                              :by => Search.mk_score_key(type,"*"),
+                                              :order => "desc")
       else
-        ids = Redis::Search.config.redis.sort(words.first,:limit => [0,limit])
+        ids = Redis::Search.config.redis.sort(words.first,
+                                              :limit => [0,limit], 
+                                              :by => Search.mk_score_key(type,"*"),
+                                              :order => "desc")
       end
       return [] if ids.blank?
       hmget(type,ids)
@@ -101,6 +111,7 @@ class Redis
       limit = options[:limit] || 10
       sort_field = options[:sort_field] || "id"
       words = words.collect { |w| Search.mk_sets_key(type,w) }
+      word_score = words.collect { |w| "#{w}:*" }
       return result if words.blank?
       temp_store_key = "tmpinterstore:#{words.join("+")}"
       if words.length > 1
@@ -111,10 +122,16 @@ class Redis
           Redis::Search.config.redis.expire(temp_store_key,86400)
         end
         # 根据需要的数量取出 ids
-        ids = Redis::Search.config.redis.sort(temp_store_key,:limit => [0,limit])
+        ids = Redis::Search.config.redis.sort(temp_store_key,
+                                              :limit => [0,limit], 
+                                              :by => Search.mk_score_key(type,"*"),
+                                              :order => "desc")
       else
         # 根据需要的数量取出 ids
-        ids = Redis::Search.config.redis.sort(words.first,:limit => [0,limit])
+        ids = Redis::Search.config.redis.sort(words.first,
+                                              :limit => [0,limit], 
+                                              :by => Search.mk_score_key(type,"*"),
+                                              :order => "desc")
       end
       hmget(type,ids, :sort_field => sort_field)
     end
