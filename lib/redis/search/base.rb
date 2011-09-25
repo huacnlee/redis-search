@@ -15,7 +15,9 @@ class Redis
         prefix_index_enable = options[:prefix_index_enable] || false
         ext_fields = options[:ext_fields] || []
         score_field = options[:score_field] || :created_at
-      
+        # Add score field to ext_fields
+        ext_fields << score_field if !ext_fields.include?(score_field)
+        
         # store Model name to indexed_models for Rake tasks
         Search.indexed_models = [] if Search.indexed_models == nil
         Search.indexed_models << self
@@ -52,7 +54,12 @@ class Redis
             index_fields_changed = false
             #{ext_fields.inspect}.each do |f|
               next if f.to_s == "id"
-              if instance_eval(f.to_s + "_changed?")
+              field_method = f.to_s + "_changed?"
+              if !self.methods.include?(field_method.to_sym)
+                ::Rails.logger.debug("[redis-search] warring! #{self.class.name} model reindex on update need "+field_method+" method.")
+                next
+              end
+              if instance_eval(field_method)
                 index_fields_changed = true
               end
             end

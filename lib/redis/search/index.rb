@@ -51,7 +51,7 @@ class Redis
         words.each do |word|
           key = Search.mk_sets_key(type,word)
           Redis::Search.config.redis.srem(key, options[:id])
-          Redis::Search.config.redis.del(Search.mk_score_key(type,self.id))
+          Redis::Search.config.redis.del(Search.mk_score_key(type,options[:id]))
         end
       end
     end
