@@ -36,7 +36,7 @@ class Redis
 
           before_destroy :redis_search_index_remove
           def redis_search_index_remove
-            Search::Index.remove(:id => self.id, :title => self.#{title_field}, :type => self.class.to_s)
+            Search::Index.remove(:id => self.id, :title => self.#{title_field}, :type => self.class.to_s) if self.redis_search_index_need_reindex
           end
           
           def redis_search_index_need_reindex
