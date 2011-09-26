@@ -33,6 +33,11 @@ class Redis
             # release s
             s = nil
           end
+          
+          def recreate_redis_search_index
+            self.redis_search_index_destroy
+            self.redis_search_index_create
+          end
 
           before_destroy :redis_search_index_destroy
           def redis_search_index_destroy
