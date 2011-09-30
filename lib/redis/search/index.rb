@@ -57,14 +57,24 @@ class Redis
         end
         
         def save_prefix_index
-          word = self.title.downcase
+          words = []
+          words << self.title.downcase
           Redis::Search.config.redis.sadd(Search.mk_sets_key(self.type,self.title), self.id)
-          key = Search.mk_complete_key(self.type)
-          (1..(word.length)).each do |l|
-            prefix = word[0...l]
-            Redis::Search.config.redis.zadd(key, 0, prefix)
+          if Search.config.pinyin_match
+            pinyin = Pinyin.t(self.title.downcase,'')
+            words << pinyin
+            Redis::Search.config.redis.sadd(Search.mk_sets_key(self.type,pinyin), self.id)
           end
-          Redis::Search.config.redis.zadd(key, 0, word + "*")
+          
+          words.each do |word|
+            
+            key = Search.mk_complete_key(self.type)
+            (1..(word.length)).each do |l|
+              prefix = word[0...l]
+              Redis::Search.config.redis.zadd(key, 0, prefix)
+            end
+            Redis::Search.config.redis.zadd(key, 0, word + "*")
+          end
         end
     end
   end
