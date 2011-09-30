@@ -9,6 +9,7 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 * Segment words search and prefix match search
 * Support ActiveRecord and Mongoid
 * Sort results by one field
+* Homophone search, pinyin search
 
 ## Requirements
 
@@ -19,8 +20,9 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 in Rails application Gemfile
 
   gem 'redis','>= 2.1.1'
-  gem "rmmseg-cpp-huacnlee", "0.2.8"
-  gem 'redis-search', '0.5'
+  gem 'chinese_pinyin', '0.3.0'
+  gem 'rmmseg-cpp-huacnlee', '0.2.8'
+  gem 'redis-search', '0.6'
 
 install bundlers
 
@@ -37,6 +39,7 @@ create file in: config/initializers/redis_search.rb
     Redis::Search.configure do |config|
       config.redis = redis
       config.complete_max_length = 100
+      config.pinyin_match = true
     end
 
 ## Usage
@@ -106,4 +109,4 @@ see [Rdoc.info redis-search](http://rubydoc.info/gems/redis-search)
     
 ## Demo
 
-You can try the search feature in [`zheye.org`](http://zheye.org)
+You can try the search feature in [`zheye.org`](http://zheye.org) | [`shu.im`](http://shu.im)
