@@ -7,7 +7,9 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 * Real-time search
 * High performance
 * Segment words search and prefix match search
-* Support ActiveRecord, Mongoid and others ORM
+* Support ActiveRecord and Mongoid
+* Sort results by one field
+* Homophone search, pinyin search
 
 ## Requirements
 
@@ -17,9 +19,10 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 
 in Rails application Gemfile
 
-	gem 'redis','>= 2.1.1'
-	gem "rmmseg-cpp-huacnlee", "0.2.8"
-	gem 'redis-search', '0.4'
+  gem 'redis','>= 2.1.1'
+  gem 'chinese_pinyin', '0.3.0'
+  gem 'rmmseg-cpp-huacnlee', '0.2.8'
+  gem 'redis-search', '0.6'
 
 install bundlers
 
@@ -36,6 +39,7 @@ create file in: config/initializers/redis_search.rb
     Redis::Search.configure do |config|
       config.redis = redis
       config.complete_max_length = 100
+      config.pinyin_match = true
     end
 
 ## Usage
@@ -48,11 +52,13 @@ bind Redis::Search callback event, it will to rebuild search indexes when data c
   
       field :title
       field :body
+      field :hits
   
       belongs_to :user
       belongs_to :category
   
       redis_search_index(:title_field => :title,
+                         :score_field => :hits,
                          :ext_fields => [:category_name])
   
       def category_name
@@ -67,9 +73,11 @@ bind Redis::Search callback event, it will to rebuild search indexes when data c
       field :name
       field :tagline
       field :email
+      field :followers_count
       
       redis_search_index(:title_field => :name,
                          :prefix_index_enable => true,
+                         :score_field => :followers_count,
                          :ext_fields => [:email,:tagline])
     end
 
@@ -91,10 +99,14 @@ If you are first install it in you old project, or your Redis cache lose, you ca
 
     $ rake redis_search:index
 
+## Documentation
+
+see [Rdoc.info redis-search](http://rubydoc.info/gems/redis-search)
+
 ## Benchmark test
 
 * [https://gist.github.com/1150933](https://gist.github.com/1150933)
     
 ## Demo
 
-You can try the search feature in [`zheye.org`](http://zheye.org)
+You can try the search feature in [`zheye.org`](http://zheye.org) | [`shu.im`](http://shu.im)

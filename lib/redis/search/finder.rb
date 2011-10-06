@@ -1,30 +1,13 @@
 # coding: utf-8
 require "rmmseg"
+require 'chinese_pinyin'
+
 class Redis
   module Search
+    # use rmmseg to split words
     def self.split(text)
-      algor = RMMSeg::Algorithm.new(text)
-      words = []
-      loop do
-        tok = algor.next_token
-        break if tok.nil?
-        words << tok.text
-      end
-      words
-    end
-    
-    def self.warn(msg)
-      puts "[Redis::Search][warn]: #{msg}"
-    end
-  
-    # 生成 uuid，用于作为 hashes 的 field, sets 关键词的值
-    def self.mk_sets_key(type, key)
-      "#{type}:#{key.downcase}"
-    end
-  
-    def self.mk_complete_key(type)
-      "Compl#{type}"
-    end
+      _split(text)
+    end    
 
     # Use for short title search, this method is search by chars, for example Tag, User, Category ...
     # 
@@ -77,9 +60,15 @@ class Redis
           Redis::Search.config.redis.expire(temp_store_key,86400)
         end
         # 根据需要的数量取出 ids
-        ids = Redis::Search.config.redis.sort(temp_store_key,:limit => [0,limit])
+        ids = Redis::Search.config.redis.sort(temp_store_key,
+                                              :limit => [0,limit], 
+                                              :by => Search.mk_score_key(type,"*"),
+                                              :order => "desc")
       else
-        ids = Redis::Search.config.redis.sort(words.first,:limit => [0,limit])
+        ids = Redis::Search.config.redis.sort(words.first,
+                                              :limit => [0,limit], 
+                                              :by => Search.mk_score_key(type,"*"),
+                                              :order => "desc")
       end
       return [] if ids.blank?
       hmget(type,ids)
@@ -94,32 +83,98 @@ class Redis
     # h3. usage:
     # * Redis::Search.query("Tag","Ruby vs Python")
     def self.query(type, text,options = {})
+      tm = Time.now
       result = []
       return result if text.strip.blank?
 
-      words = Search.split(text)
       limit = options[:limit] || 10
       sort_field = options[:sort_field] || "id"
+
+      words = Search.split(text)
       words = words.collect { |w| Search.mk_sets_key(type,w) }
+      
       return result if words.blank?
+      
       temp_store_key = "tmpinterstore:#{words.join("+")}"
+      
       if words.length > 1
         if !Redis::Search.config.redis.exists(temp_store_key)
           # 将多个词语组合对比，得到交集，并存入临时区域
           Redis::Search.config.redis.sinterstore(temp_store_key,*words)
           # 将临时搜索设为1天后自动清除
           Redis::Search.config.redis.expire(temp_store_key,86400)
+          
+          # 拼音搜索
+          if Search.config.pinyin_match
+            pinyin_words = Search.split_pinyin(text)
+            pinyin_words = pinyin_words.collect { |w| Search.mk_sets_key(type,w) }
+            temp_sunion_key = "tmpsunionstore:#{words.join("+")}"
+            if Search.config.pinyin_match
+              temp_pinyin_store_key = "tmpinterstore:#{pinyin_words.join("+")}"
+            end
+            # 找出拼音的
+            Redis::Search.config.redis.sinterstore(temp_pinyin_store_key,*pinyin_words)
+            # 合并中文和拼音的搜索结果
+            Redis::Search.config.redis.sunionstore(temp_sunion_key,*[temp_store_key,temp_pinyin_store_key])
+            # 将临时搜索设为1天后自动清除
+            Redis::Search.config.redis.expire(temp_pinyin_store_key,86400)
+            Redis::Search.config.redis.expire(temp_sunion_key,86400)
+            temp_store_key = temp_sunion_key
+          end
         end
-        # 根据需要的数量取出 ids
-        ids = Redis::Search.config.redis.sort(temp_store_key,:limit => [0,limit])
       else
-        # 根据需要的数量取出 ids
-        ids = Redis::Search.config.redis.sort(words.first,:limit => [0,limit])
+        temp_store_key = words.first
       end
-      hmget(type,ids, :sort_field => sort_field)
+      
+      # 根据需要的数量取出 ids
+      ids = Redis::Search.config.redis.sort(temp_store_key,
+                                            :limit => [0,limit], 
+                                            :by => Search.mk_score_key(type,"*"),
+                                            :order => "desc")
+      result = hmget(type,ids, :sort_field => sort_field)
+      Search.info("{#{type} : \"#{text}\"} | Time spend: #{Time.now - tm}s")
+      result 
     end
   
+    protected
+      def self.split_pinyin(text)
+        # Pinyin search split as pinyin again
+        _split(Pinyin.t(text))
+      end
+  
     private
+      def self._split(text)
+        algor = RMMSeg::Algorithm.new(text)
+        words = []
+        loop do
+          tok = algor.next_token
+          break if tok.nil?
+          words << tok.text
+        end
+        words
+      end
+    
+      def self.warn(msg)
+        ::Rails.logger.warn("\e[33m[Redis::Search] #{msg}\e[0m")
+      end
+      
+      def self.info(msg)
+        ::Rails.logger.debug("\e[32m[Redis::Search] #{msg}\e[0m")
+      end
+  
+      # 生成 uuid，用于作为 hashes 的 field, sets 关键词的值
+      def self.mk_sets_key(type, key)
+        "#{type}:#{key.downcase}"
+      end
+    
+      def self.mk_score_key(type, id)
+        "#{type}:_score_:#{id}"
+      end
+  
+      def self.mk_complete_key(type)
+        "Compl#{type}"
+      end
+      
       def self.hmget(type, ids, options = {})
         result = []
         sort_field = options[:sort_field] || "id"
