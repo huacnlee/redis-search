@@ -43,11 +43,6 @@ class Redis
             # release s
             s = nil
           end
-          
-          def recreate_redis_search_index
-            self.redis_search_index_destroy
-            self.redis_search_index_create
-          end
 
           before_destroy :redis_search_index_destroy
           def redis_search_index_destroy
@@ -60,7 +55,7 @@ class Redis
               next if f.to_s == "id"
               field_method = f.to_s + "_changed?"
               if !self.methods.include?(field_method.to_sym)
-                ::Rails.logger.debug("[redis-search] warring! #{self.class.name} model reindex on update need "+field_method+" method.")
+                Search.warn("#{self.class.name} model reindex on update need "+field_method+" method.")
                 next
               end
               if instance_eval(field_method)
@@ -78,12 +73,16 @@ class Redis
           
           after_update :redis_search_index_remove
           def redis_search_index_remove
-            Search::Index.remove(:id => self.id, :title => self.#{title_field}_was, :type => self.class.to_s) if self.redis_search_index_need_reindex
+            if self.redis_search_index_need_reindex
+              Search::Index.remove(:id => self.id, :title => self.#{title_field}_was, :type => self.class.to_s)
+            end
           end
 
           after_save :redis_search_index_update
           def redis_search_index_update
-            self.redis_search_index_create if self.redis_search_index_need_reindex
+            if self.redis_search_index_need_reindex
+              self.redis_search_index_create
+            end
           end
         )
       end
