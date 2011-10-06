@@ -31,7 +31,7 @@ class Redis
             exts
           end
 
-          after_create :redis_search_index_create
+          # after_create :redis_search_index_create
           def redis_search_index_create
             s = Search::Index.new(:title => self.#{title_field}, 
                            :id => self.id, 
@@ -43,14 +43,18 @@ class Redis
             # release s
             s = nil
           end
-
-          before_destroy :redis_search_index_remove
-          def redis_search_index_remove
-            Search::Index.remove(:id => self.id, :title => self.#{title_field}, :type => self.class.to_s)
+          
+          def recreate_redis_search_index
+            self.redis_search_index_destroy
+            self.redis_search_index_create
           end
 
-          before_update :redis_search_index_update
-          def redis_search_index_update
+          before_destroy :redis_search_index_destroy
+          def redis_search_index_destroy
+            Search::Index.remove(:id => self.id, :title => self.#{title_field}, :type => self.class.to_s)
+          end
+          
+          def redis_search_index_need_reindex
             index_fields_changed = false
             #{ext_fields.inspect}.each do |f|
               next if f.to_s == "id"
@@ -69,10 +73,17 @@ class Redis
               end
             rescue
             end
-            if index_fields_changed
-              Search::Index.remove(:id => self.id, :title => self.#{title_field}_was, :type => self.class.to_s)
-              self.redis_search_index_create
-            end
+            return index_fields_changed
+          end
+          
+          after_update :redis_search_index_remove
+          def redis_search_index_remove
+            Search::Index.remove(:id => self.id, :title => self.#{title_field}_was, :type => self.class.to_s) if self.redis_search_index_need_reindex
+          end
+
+          after_save :redis_search_index_update
+          def redis_search_index_update
+            self.redis_search_index_create if self.redis_search_index_need_reindex
           end
         )
       end
