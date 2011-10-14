@@ -19,8 +19,7 @@ Mongoid.configure do |config|
   if !mongoid_config['uri'].blank?
     config.master = Mongo::Connection.from_uri(mongoid_config['uri']).db(mongoid_config['uri'].split('/').last)
   else
-    name = "redis_search_test"
-    config.master = Mongo::Connection.new(:host => mongoid_config[:host], :port => mongoid_config[:port]).db(mongoid_config[:database])
+    config.master = Mongo::Connection.new(mongoid_config['host'], mongoid_config['port']).db(mongoid_config['database'])
   end
 end
 
@@ -30,7 +29,6 @@ require "models"
 redis_config = YAML.load_file(File.join(File.dirname(__FILE__),"redis.yml"))['test']
 if !redis_config['uri'].blank?
   uri = URI.parse(redis_config['uri'])
-  puts redis_config['uri']
   $redis = Redis.new(:host => uri.host,:port => uri.port, :password => uri.password)
 else
   $redis = Redis.new(:host => redis_config['host'],:port => redis_config['port'])

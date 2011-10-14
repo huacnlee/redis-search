@@ -4,7 +4,6 @@ gem "rake"
 group :test do
   gem 'activesupport'
   gem 'redis'
-  gem 'guard-rspec'
   gem "redis-namespace"
   gem "rmmseg-cpp-huacnlee"
   gem 'mongoid', '2.2.0'

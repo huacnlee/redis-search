@@ -1,5 +1,5 @@
 require 'rake'
 
 task :default do
-  nil
+  system 'bundle exec rspec spec'
 end
