@@ -53,9 +53,5 @@ class Category
 
   redis_search_index(:title_field => :name,
                      :prefix_index_enable => true,
-                     :ext_fields => [:category_name])
-
-  def category_name
-    self.category.name
-  end
+                     :ext_fields => [])
 end

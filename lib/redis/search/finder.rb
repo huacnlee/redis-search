@@ -20,6 +20,7 @@ class Redis
     # * Redis::Search.complete("Tag","red") => ["Redis", "Redmine"]
     # * Redis::Search.complete("Tag","redi") => ["Redis"]
     def self.complete(type, w, options = {})
+      return [] if w.blank? or type.blank?
       limit = options[:limit] || 10 
 
       prefix_matchs = []
@@ -154,6 +155,7 @@ class Redis
       end
     
       def self.warn(msg)
+        return if not Search.config.debug
         msg = "\e[33m[Redis::Search] #{msg}\e[0m"
         if defined?(Rails) == 'constant' && Rails.class == Class
           ::Rails.logger.warn(msg)
@@ -163,6 +165,7 @@ class Redis
       end
       
       def self.info(msg)
+        return if not Search.config.debug
         msg = "\e[32m[Redis::Search] #{msg}\e[0m"
         if defined?(Rails) == 'constant' && Rails.class == Class
           ::Rails.logger.debug(msg)

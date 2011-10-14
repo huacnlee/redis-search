@@ -1,0 +1,2 @@
+test:
+  uri: mongodb://huacnlee:123456@staff.mongohq.com:10067/redis_search_ci_test
