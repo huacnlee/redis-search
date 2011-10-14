@@ -154,11 +154,21 @@ class Redis
       end
     
       def self.warn(msg)
-        ::Rails.logger.warn("\e[33m[Redis::Search] #{msg}\e[0m")
+        msg = "\e[33m[Redis::Search] #{msg}\e[0m"
+        if defined?(Rails) == 'constant' && Rails.class == Class
+          ::Rails.logger.warn(msg)
+        else
+          puts msg
+        end
       end
       
       def self.info(msg)
-        ::Rails.logger.debug("\e[32m[Redis::Search] #{msg}\e[0m")
+        msg = "\e[32m[Redis::Search] #{msg}\e[0m"
+        if defined?(Rails) == 'constant' && Rails.class == Class
+          ::Rails.logger.debug(msg)
+        else
+          puts msg
+        end
       end
   
       # 生成 uuid，用于作为 hashes 的 field, sets 关键词的值
@@ -180,7 +190,7 @@ class Redis
         return result if ids.blank?
         Redis::Search.config.redis.hmget(type,*ids).each do |r|
           begin
-            result << JSON.parse(r)
+            result << JSON.parse(r) if !r.blank?
           rescue => e
             Search.warn("Search.query failed: #{e}")
           end

@@ -33,9 +33,9 @@ install bundlers
 create file in: config/initializers/redis_search.rb
 
     require "redis-search"
+    # don't forget change namespace
     redis = Redis.new(:host => "127.0.0.1",:port => "6379")
-    # change redis database to 3, you need use a special database for search feature.
-    redis.select(3)
+    redis = Redis::Namespace.new("your_app_name:redis_search", :redis => redis)
     Redis::Search.configure do |config|
       config.redis = redis
       config.complete_max_length = 100

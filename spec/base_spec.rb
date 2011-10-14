@@ -2,15 +2,7 @@
 require "spec_helper"
 
 describe Redis::Search do
-  before do
-    @redis = Redis.new(:host => "127.0.0.1",:port => "6379")
-    Redis::Search.configure do |config|
-      config.redis = @redis
-      config.complete_max_length = 100
-      config.pinyin_match = true
-    end
-  end
-  
+
   describe "configuration" do
     it "does configure have `config` and there attribute" do
       Redis::Search.should respond_to(:config)
@@ -21,7 +13,7 @@ describe Redis::Search do
     end
     
     it "does befor config has success" do
-      Redis::Search.config.redis.should == @redis
+      Redis::Search.config.redis.should == $redis
       Redis::Search.config.complete_max_length.should == 100
       Redis::Search.config.pinyin_match.should == true
       Redis::Search.config.debug.should == false

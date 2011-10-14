@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency("chinese_pinyin", [">= 0.3.0"])
   s.add_dependency("rmmseg-cpp-huacnlee", [">= 0.2.8"])
+  s.add_dependency("redis-namespace", "~> 1.0.2")
   s.add_dependency("redis", [">= 2.1.1"])
 
   s.files        = Dir.glob("lib/**/*") + %w(README.markdown)
