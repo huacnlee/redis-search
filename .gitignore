@@ -1,4 +1,2 @@
 *.gem
-spec/mongoid.yml
-spec/redis.yml
 

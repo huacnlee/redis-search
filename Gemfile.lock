@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    redis-search (0.6.3)
+    redis-search (0.6.4)
       chinese_pinyin (>= 0.3.0)
       redis (>= 2.1.1)
       redis-namespace (~> 1.0.2)

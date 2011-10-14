@@ -50,3 +50,20 @@ Rspec.configure do |config|
     end
   end
 end
+
+class RandomWord
+  attr_accessor :word_dict, :size
+  def initialize
+    path = "/usr/share/dict/words"
+    self.word_dict = File.open("/usr/share/dict/words").read.split("\n")
+    self.size = self.word_dict.count
+  end
+  
+  def next(words = 2, length = 23)
+    name = 'a'*(length+1)
+    while name.length > length
+      name = (1..words).map{ |i| self.word_dict[rand(self.size)].chomp.capitalize }.join(" ")
+    end
+    name
+  end
+end

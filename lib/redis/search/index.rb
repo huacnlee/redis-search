@@ -3,6 +3,12 @@ class Redis
     class Index
       attr_accessor :type, :title, :id,:score, :exts, :condition_fields, :prefix_index_enable
       def initialize(options = {})
+        # default data
+        self.condition_fields = []
+        self.exts = []
+        self.prefix_index_enable = false
+        
+        # set attributes value from params
         options.keys.each do |k|
           eval("self.#{k} = options[k]")
         end
