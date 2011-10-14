@@ -1,8 +1,8 @@
 rvm: 
-	- 1.9.2
+  - 1.9.2
   - 1.8.7
   - ree
 before_script: 
-	- "cp spec/mongoid.yml.forci spec/mongoid.yml"
+  - "cp spec/mongoid.yml.forci spec/mongoid.yml"
   - "cp spec/redis.yml.forci spec/redis.yml"
 
