@@ -45,6 +45,8 @@ Rspec.configure do |config|
   config.after :suite do
     Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
     keys = $redis.keys("*")
-    $redis.del(*keys)
+    if keys.length > 1
+      $redis.del(*keys)
+    end
   end
 end

@@ -12,6 +12,7 @@ class Post
 
   redis_search_index(:title_field => :title,
                      :score_field => :hits,
+                     :condition_fields => [:category_id,:user_id],
                      :ext_fields => [:category_name,:user_name])
 
   def category_name
@@ -33,11 +34,13 @@ class User
   field :password
   field :name
   field :score
+  field :sex, :type => Integer, :default => 0
   
   has_many :posts
 
   redis_search_index(:title_field => :name,
                      :score_field => :score,
+                     :condition_fields => [:sex],
                      :prefix_index_enable => true,
                      :ext_fields => [:email])
 end

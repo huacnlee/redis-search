@@ -15,15 +15,18 @@ class Redis
         prefix_index_enable = options[:prefix_index_enable] || false
         ext_fields = options[:ext_fields] || []
         score_field = options[:score_field] || :created_at
+        condition_fields = options[:condition_fields] || []
         # Add score field to ext_fields
-        ext_fields << score_field if !ext_fields.include?(score_field)
+        ext_fields |= [score_field]
+        # Add condition fields to ext_fields
+        ext_fields |= condition_fields
         
         # store Model name to indexed_models for Rake tasks
         Search.indexed_models = [] if Search.indexed_models == nil
         Search.indexed_models << self
         # bind instance methods and callback events
         class_eval %(
-          def redis_search_ext_fields(ext_fields)
+          def redis_search_fields_to_hash(ext_fields)
             exts = {}
             ext_fields.each do |f|
               exts[f] = instance_eval(f.to_s)
@@ -34,11 +37,12 @@ class Redis
           # after_create :redis_search_index_create
           def redis_search_index_create
             s = Search::Index.new(:title => self.#{title_field}, 
-                           :id => self.id, 
-                           :exts => self.redis_search_ext_fields(#{ext_fields.inspect}), 
-                           :type => self.class.to_s,
-                           :score => self.#{score_field}.to_i,
-                           :prefix_index_enable => #{prefix_index_enable})
+                                  :id => self.id, 
+                                  :exts => self.redis_search_fields_to_hash(#{ext_fields.inspect}), 
+                                  :type => self.class.to_s,
+                                  :condition_fields => #{condition_fields},
+                                  :score => self.#{score_field}.to_i,
+                                  :prefix_index_enable => #{prefix_index_enable})
             s.save
             # release s
             s = nil

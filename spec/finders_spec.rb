@@ -3,12 +3,12 @@ require "spec_helper"
 
 describe "Redis::Search Finders" do
   before :all do
-    @user1 = User.create(:email => "zsf@gmail.com", :name => "张三丰", :score => 100, :password => "123456")
-    @user2 = User.create(:email => "liubei@gmail.com", :name => "刘备", :score => 200, :password => "abcd")
-    @user3 = User.create(:email => "zicheng.lhs@taobao.com", :name => "李自成", :score => 20, :password => "dsad")
-    @user4 = User.create(:email => "zhang-wuji@me.com", :name => "张无忌", :score => 2000, :password => "123456762")
-    @user5 = User.create(:email => "liao.zhang@apple.com", :name => "张辽", :score => 700, :password => "abcdks")
-    @user6 = User.create(:email => "leo-cheng@gmail.com", :name => "Leo Peter Cheng", :score => 3, :password => "kdhs")
+    @user1 = User.create(:email => "zsf@gmail.com", :sex => 1, :name => "张三丰", :score => 100, :password => "123456")
+    @user2 = User.create(:email => "liubei@gmail.com", :sex => 2, :name => "刘备", :score => 200, :password => "abcd")
+    @user3 = User.create(:email => "zicheng.lhs@taobao.com", :sex => 1, :name => "李自成", :score => 20, :password => "dsad")
+    @user4 = User.create(:email => "zhang-wuji@me.com", :sex => 1, :name => "张无忌", :score => 2000, :password => "123456762")
+    @user5 = User.create(:email => "liao.zhang@apple.com", :sex => 0, :name => "张辽", :score => 700, :password => "abcdks")
+    @user6 = User.create(:email => "leo-cheng@gmail.com", :sex => 2, :name => "Leo Peter Cheng", :score => 3, :password => "kdhs")
     
     @category1 = Category.create(:name => "Programming")
     @category2 = Category.create(:name => "My live")
@@ -79,7 +79,7 @@ describe "Redis::Search Finders" do
     end
     
     it "does can return defined attributes" do
-      Redis::Search.complete("User","张三")[0].keys.should == ["title", "id", "type", "email", "score"]
+      Redis::Search.complete("User","张三")[0].keys.should == ["title", "id", "type", "email", "score", "sex"]
     end
     
     it "does can return right attribute values" do
@@ -111,6 +111,17 @@ describe "Redis::Search Finders" do
       Redis::Search.complete("",nil).should == []
       Redis::Search.complete("User","adslgkjaslkdgjalksdgj").should == []
     end
+    
+    it "does search with conditions" do
+      Redis::Search.complete("User", "l", :conditions => [:sex => 2]).count.should == 2
+      Redis::Search.complete("User", "li", :conditions => [:sex => 2]).count.should == 1
+    end
+    
+    it "does search only by conditions" do
+      Redis::Search.complete("User", "", :conditions => [:sex => 1]).count.should == 3
+      Redis::Search.complete("User", "", :conditions => [:sex => 2]).count.should == 2
+      Redis::Search.complete("User", "", :conditions => [:sex => 0]).count.should == 1
+    end
   end
   
   describe "[Query] method" do
@@ -137,6 +148,22 @@ describe "Redis::Search Finders" do
       Redis::Search.query("Post", "redis搜索jie shao")[0]['title'].should == @post3.title
       Redis::Search.query("Post", "ruby 插件搜索redis jie shao")[0]['title'].should == @post3.title
       Redis::Search.query("Post", "jie")[0]['title'].should == @post3.title
+    end
+    
+    it "does search with a conditions" do
+      Redis::Search.query("Post", "Ruby", :conditions => [:user_id => @user3.id]).count.should == 1
+      Redis::Search.query("Post", "Ruby on Rails", :conditions => [:user_id => @user3.id]).count.should == 0
+    end
+    
+    it "does search with more conditions" do
+      Redis::Search.query("Post", "", :conditions => [:user_id => @user3.id, :category_id => @category1.id]).count.should == 1
+      Redis::Search.query("Post", "Ruby", :conditions => [:user_id => @user3.id, :category_id => @category1.id]).count.should == 1
+      Redis::Search.query("Post", "Ruby", :conditions => [:user_id => @user3.id, :category_id => @category2.id]).count.should == 0
+    end
+    
+    it "does search only by conditions" do
+      Redis::Search.query("Post", "", :conditions => [:user_id => @user3.id]).count.should == 2
+      Redis::Search.query("Post", "", :conditions => [:category_id => @category2.id]).count.should == 1
     end
   end
   

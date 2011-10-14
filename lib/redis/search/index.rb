@@ -1,9 +1,8 @@
 class Redis
   module Search
     class Index
-      attr_accessor :type, :title, :id,:score, :exts, :prefix_index_enable
+      attr_accessor :type, :title, :id,:score, :exts, :condition_fields, :prefix_index_enable
       def initialize(options = {})
-        self.exts = []
         options.keys.each do |k|
           eval("self.#{k} = options[k]")
         end
@@ -28,11 +27,16 @@ class Redis
           # score for search sort
           Redis::Search.config.redis.set(Search.mk_score_key(self.type,self.id),self.score)
         end
+        
+        # 将目前的编号保存到条件(conditions)字段所创立的索引上面
+        self.condition_fields.each do |field|
+          Redis::Search.config.redis.sadd(Search.mk_condition_key(self.type,field,data[field.to_sym]), self.id)
+        end
 
         # 建立前最索引
         if prefix_index_enable
           save_prefix_index
-        end
+        end     
       end
       
       def self.remove(options = {})
