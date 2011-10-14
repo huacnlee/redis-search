@@ -92,6 +92,59 @@ namespace :benchmark do
     end
   end
   
+  task :test1 do
+    Benchmark.bm do|bm|
+      puts "    c result:\n#{Redis::Search.complete("CategoryTest","c", :limit => 10).collect { |c| c['title'] }}"
+      bm.report("    'c' word 10 times") do
+        10.times do |i|
+          Redis::Search.complete("CategoryTest","c", :limit => 10)
+        end
+      end
+      
+      puts "    a result:\n#{Redis::Search.complete("CategoryTest","a", :limit => 10).collect { |c| c['title'] }}"
+      bm.report("    'a' word 10 times") do
+        10.times do |i|
+          Redis::Search.complete("CategoryTest","a", :limit => 10)
+        end
+      end
+      
+      puts "    b result:\n#{Redis::Search.complete("CategoryTest","b", :limit => 10).collect { |c| c['title'] }}"
+      bm.report("    'b' word 10 times") do
+        10.times do |i|
+          Redis::Search.complete("CategoryTest","b", :limit => 10)
+        end
+      end
+      
+      puts "    f result:\n#{Redis::Search.complete("CategoryTest","f", :limit => 10).collect { |c| c['title'] }}"
+      bm.report("    'f' word 10 times") do
+        10.times do |i|
+          Redis::Search.complete("CategoryTest","f", :limit => 10)
+        end
+      end
+      
+      puts "    t result:\n#{Redis::Search.complete("CategoryTest","t", :limit => 10).collect { |c| c['title'] }}"
+      bm.report("    't' word 10 times") do
+        10.times do |i|
+          Redis::Search.complete("CategoryTest","t", :limit => 10)
+        end
+      end
+      
+      puts "    d result:\n#{Redis::Search.complete("CategoryTest","d", :limit => 10).collect { |c| c['title'] }}"
+      bm.report("    'd' word 10 times") do
+        10.times do |i|
+          Redis::Search.complete("CategoryTest","d", :limit => 10)
+        end
+      end
+      
+      puts "    m result:\n#{Redis::Search.complete("CategoryTest","m", :limit => 10).collect { |c| c['title'] }}"
+      bm.report("    'm' word 10 times") do
+        10.times do |i|
+          Redis::Search.complete("CategoryTest","m", :limit => 10)
+        end
+      end
+    end
+  end
+  
   task :query do
     keys_count = $redis.dbsize
     puts "Query Benchmark from [CategoryTest], current have (#{keys_count} keys) in Redis"
