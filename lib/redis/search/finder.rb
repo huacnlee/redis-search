@@ -1,5 +1,4 @@
 # coding: utf-8
-require "rmmseg"
 require 'chinese_pinyin'
 
 class Redis

@@ -1,4 +1,5 @@
 # coding: utf-8
+require "rmmseg"
 class Redis
   module Search
     class << self
@@ -30,6 +31,8 @@ class Redis
         self.redis = nil
         self.complete_max_length = 100
         self.pinyin_match = false
+        # loading RMMSeg chinese word dicts.
+        RMMSeg::Dictionary.load_dictionaries
       end
     end
   end
