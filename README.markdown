@@ -4,7 +4,7 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 
 ## Status
 
-"!https://secure.travis-ci.org/huacnlee/redis-search.png!":http://travis-ci.org/huacnlee/redis-search
+[![CI Status](https://secure.travis-ci.org/huacnlee/redis-search.png)](http://travis-ci.org/huacnlee/redis-search)
 
 ## Features
 
