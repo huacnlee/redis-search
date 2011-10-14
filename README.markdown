@@ -24,7 +24,7 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 in Rails application Gemfile
 
     gem 'redis','>= 2.1.1'
-    gem 'chinese_pinyin', '0.3.0'
+    gem 'chinese_pinyin', '0.4.1'
     gem 'rmmseg-cpp-huacnlee', '0.2.9'
     gem 'redis-search', '0.6.2'
 
