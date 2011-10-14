@@ -73,6 +73,11 @@ class Redis
           
           after_update :redis_search_index_remove
           def redis_search_index_remove
+            # DEBUG info
+            # puts '>>>>>>>>>>>>>>>>>>>>>>' 
+            # puts self.redis_search_index_need_reindex
+            # puts self.#{title_field}_was
+            # puts self.#{title_field}
             if self.redis_search_index_need_reindex
               Search::Index.remove(:id => self.id, :title => self.#{title_field}_was, :type => self.class.to_s)
             end

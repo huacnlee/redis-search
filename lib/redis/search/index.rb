@@ -44,6 +44,9 @@ class Redis
           Redis::Search.config.redis.srem(key, options[:id])
           Redis::Search.config.redis.del(Search.mk_score_key(type,options[:id]))
         end
+        
+        # remove set for prefix index key
+        Redis::Search.config.redis.srem(Search.mk_sets_key(type,options[:title]),options[:id])
       end
       
       private
