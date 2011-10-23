@@ -46,6 +46,7 @@ class Redis
             s.save
             # release s
             s = nil
+            true
           end
 
           before_destroy :redis_search_index_destroy
@@ -86,6 +87,7 @@ class Redis
             if self.redis_search_index_need_reindex
               Search::Index.remove(:id => self.id, :title => self.#{title_field}_was, :type => self.class.to_s)
             end
+            true
           end
 
           after_save :redis_search_index_update
@@ -93,6 +95,7 @@ class Redis
             if self.redis_search_index_need_reindex
               self.redis_search_index_create
             end
+            true
           end
         )
       end
