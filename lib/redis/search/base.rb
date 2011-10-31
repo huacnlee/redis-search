@@ -92,7 +92,7 @@ class Redis
 
           after_save :redis_search_index_update
           def redis_search_index_update
-            if self.redis_search_index_need_reindex
+            if self.redis_search_index_need_reindex or self._id == nil
               self.redis_search_index_create
             end
             true
