@@ -143,6 +143,11 @@ describe "Redis::Search Finders" do
       Redis::Search.query("Post", "Twitter设计Bootstrap")[0]['title'].should == @post2.title
     end
     
+    it "does search Ext field existed." do
+      Redis::Search.query("Post", "How do")[0]['category_name'] == @category1.name
+      Redis::Search.query("Post", "How do")[0]['user_name'] == @user1.name
+    end
+    
     it "does search with Pinyin" do
       Redis::Search.query("Post", "jie shao 搜索")[0]['title'].should == @post3.title
       Redis::Search.query("Post", "redis搜索jie shao")[0]['title'].should == @post3.title

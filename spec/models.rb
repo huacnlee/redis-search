@@ -16,11 +16,11 @@ class Post
                      :ext_fields => [:category_name,:user_name])
 
   def category_name
-    self.category.name
+    self.category.name if not self.category.blank?
   end
   
   def user_name
-    self.user.name
+    self.user.name if not self.category.blank?
   end
 end
 

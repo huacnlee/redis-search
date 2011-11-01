@@ -34,7 +34,6 @@ class Redis
             exts
           end
 
-          # after_create :redis_search_index_create
           def redis_search_index_create
             s = Search::Index.new(:title => self.#{title_field}, 
                                   :id => self.id, 
