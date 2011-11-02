@@ -27,8 +27,8 @@ GEM
       metaclass (~> 0.0.1)
     mongo (1.3.1)
       bson (>= 1.3.1)
-    mongoid (2.3.3)
-      activemodel (~> 3.1)
+    mongoid (2.2.4)
+      activemodel (~> 3.0)
       mongo (~> 1.3)
       tzinfo (~> 0.3.22)
     multi_json (1.0.3)
@@ -55,7 +55,7 @@ DEPENDENCIES
   bson (= 1.3.1)
   bson_ext (= 1.3.1)
   mocha
-  mongoid (> 2.2.1)
+  mongoid (= 2.2.4)
   rake
   redis
   redis-namespace
