@@ -126,4 +126,4 @@ There is my performance test result.
     
 ## Demo
 
-You can try the search feature in [`zheye.org`](http://zheye.org) | [`shu.im`](http://shu.im)
+You can try the search feature in [`zheye.org`](http://zheye.org) | [`ruby-china`](http://ruby-china.org) | [`shu.im`](http://shu.im)
