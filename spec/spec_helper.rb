@@ -40,7 +40,7 @@ Redis::Search.configure do |config|
   config.pinyin_match = true
 end
 
-Rspec.configure do |config|
+RSpec.configure do |config|
   config.mock_with :mocha
   config.after :suite do
     Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
