@@ -28,9 +28,10 @@ in Rails application Gemfile
 
     gem 'redis','>= 2.1.1'
     gem 'chinese_pinyin', '0.4.1'
+    # add rmmseg if you need search by segment words
     gem 'rmmseg-cpp-huacnlee', '0.2.9'
     gem 'redis-namespace','~> 1.1.0'
-    gem 'redis-search', '0.6.3'
+    gem 'redis-search', '0.7.1'
 
 install bundlers
 
@@ -53,6 +54,8 @@ create file in: config/initializers/redis_search.rb
       config.redis = redis
       config.complete_max_length = 100
       config.pinyin_match = true
+      # use rmmseg, true to disable it, it can save memroy
+      config.disable_rmmseg = false
     end
 
 ## Usage

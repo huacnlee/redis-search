@@ -1,6 +1,5 @@
 # coding: utf-8
 require 'chinese_pinyin'
-
 class Redis
   module Search
     # use rmmseg to split words
@@ -165,7 +164,7 @@ class Redis
       end
       
       # 根据需要的数量取出 ids
-      ids = Redis::Search.config.redis.sort(temp_store_key,
+      ids = Search.config.redis.sort(temp_store_key,
                                             :limit => [0,limit], 
                                             :by => Search.mk_score_key(type,"*"),
                                             :order => "desc")
@@ -182,6 +181,9 @@ class Redis
   
     private
       def self._split(text)
+        # return chars if disabled rmmseg
+        return text.split("") if Search.config.disable_rmmseg
+          
         algor = RMMSeg::Algorithm.new(text)
         words = []
         loop do
@@ -193,7 +195,7 @@ class Redis
       end
     
       def self.warn(msg)
-        return if not Search.config.debug
+        return if not Redis::Search.config.debug
         msg = "\e[33m[Redis::Search] #{msg}\e[0m"
         if defined?(Rails) == 'constant' && Rails.class == Class
           ::Rails.logger.warn(msg)
@@ -203,7 +205,7 @@ class Redis
       end
       
       def self.info(msg)
-        return if not Search.config.debug
+        return if not Redis::Search.config.debug
         msg = "\e[32m[Redis::Search] #{msg}\e[0m"
         if defined?(Rails) == 'constant' && Rails.class == Class
           ::Rails.logger.debug(msg)
