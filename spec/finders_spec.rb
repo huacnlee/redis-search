@@ -3,7 +3,7 @@ require "spec_helper"
 
 describe "Redis::Search Finders" do
   before :all do
-    @user1 = User.create(:email => "zsf@gmail.com", :sex => 1, :name => "张三丰", :score => 100, :password => "123456")
+    @user1 = User.create(:email => "zsf@gmail.com", :sex => 1, :name => "张三丰", :alias => ["张三疯","张麻子"], :score => 100, :password => "123456")
     @user2 = User.create(:email => "liubei@gmail.com", :sex => 2, :name => "刘备", :score => 200, :password => "abcd")
     @user3 = User.create(:email => "zicheng.lhs@taobao.com", :sex => 1, :name => "李自成", :score => 20, :password => "dsad")
     @user4 = User.create(:email => "zhang-wuji@me.com", :sex => 1, :name => "张无忌", :score => 2000, :password => "123456762")
@@ -62,6 +62,12 @@ describe "Redis::Search Finders" do
       
       Redis::Search.complete("User","张三").count.should == 1
       Redis::Search.complete("User","张三丰").count.should == 1
+    end
+    
+    it "should search with alias" do
+      Redis::Search.complete("User","张三疯").count.should == 1
+      Redis::Search.complete("User","张麻").count.should == 1
+      Redis::Search.complete("User","张麻子").count.should == 1
     end
     
     it "does Pinyin can complete with prefix" do

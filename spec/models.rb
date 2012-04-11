@@ -4,6 +4,7 @@ class Post
   include Redis::Search
 
   field :title
+  field :alias, :type => Array, :default => []
   field :body
   field :hits
 
@@ -33,12 +34,14 @@ class User
   field :email
   field :password
   field :name
+  field :alias, :type => Array, :default => []
   field :score
   field :sex, :type => Integer, :default => 0
   
   has_many :posts
 
   redis_search_index(:title_field => :name,
+                     :alias_field => :alias,
                      :score_field => :score,
                      :condition_fields => [:sex],
                      :prefix_index_enable => true,
