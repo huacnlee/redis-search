@@ -36,9 +36,9 @@ class Redis
             exts
           end
           
-          def redis_search_alias_value(alias_field)
-            return [] if alias_field.blank? or alias_field == "_was"
-            val = instance_eval("self.#{alias_field}")
+          def redis_search_alias_value(field)
+            return [] if field.blank? or field == "_was"
+            val = instance_eval("self.\#{field}").clone
             return [] if !val.class.in?([String,Array])
             if val.is_a?(String)
               val = val.to_s.split(",")
@@ -109,7 +109,6 @@ class Redis
               titles = []
               titles = redis_search_alias_value("#{alias_field}_was")
               titles << self.#{title_field}_was
-            
               redis_search_index_delete(titles)
             end
             true
