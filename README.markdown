@@ -13,6 +13,7 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 * Real-time search
 * High performance
 * Segment words search and prefix match search
+* Support match with alias
 * Support ActiveRecord and Mongoid
 * Sort results by one field
 * Homophone search, pinyin search
@@ -31,7 +32,7 @@ in Rails application Gemfile
     # add rmmseg if you need search by segment words
     gem 'rmmseg-cpp-huacnlee', '0.2.9'
     gem 'redis-namespace','~> 1.1.0'
-    gem 'redis-search', '0.7.1'
+    gem 'redis-search', '0.8.0'
 
 install bundlers
 
@@ -88,11 +89,13 @@ bind Redis::Search callback event, it will to rebuild search indexes when data c
       include Redis::Search
       
       field :name
+	  field :alias_names, :type => Array
       field :tagline
       field :email
       field :followers_count
       
       redis_search_index(:title_field => :name,
+		                 :alias_field => :alias_names,
                          :prefix_index_enable => true,
                          :score_field => :followers_count,
                          :ext_fields => [:email,:tagline])
