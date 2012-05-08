@@ -132,4 +132,6 @@ There is my performance test result.
     
 ## Demo
 
-You can try the search feature in [`zheye.org`](http://zheye.org) | [`ruby-china`](http://ruby-china.org) | [`shu.im`](http://shu.im)
+![](http://l.ruby-china.org/photo/34368688ee1c1928c2841eb2f41306ec.png)
+
+You can try the search feature in [`720p.so`](http://720p.so) | [`shu.im`](http://shu.im)
