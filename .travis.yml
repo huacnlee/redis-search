@@ -1,5 +1,4 @@
 rvm: 1.9.2
-before_script: 
-  - "cp spec/mongoid.yml.forci spec/mongoid.yml"
+before_script:
   - "cp spec/redis.yml.forci spec/redis.yml"
 
