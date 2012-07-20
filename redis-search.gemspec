@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |s|
   s.name        = "redis-search"
-  s.version     = "0.8.0"
+  s.version     = "0.9.0"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Jason Lee"]
   s.email       = ["huacnlee@gmail.com"]
@@ -15,6 +15,6 @@ Gem::Specification.new do |s|
   s.add_dependency("redis-namespace", ">= 1.0.2")
   s.add_dependency("redis", [">= 2.1.1"])
 
-  s.files        = Dir.glob("lib/**/*") + %w(README.markdown)
+  s.files        = Dir.glob("lib/**/*") + %w(README.md)
   s.require_path = 'lib'
 end

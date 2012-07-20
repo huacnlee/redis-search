@@ -23,6 +23,7 @@ You can try the search feature in [`720p.so`](http://720p.so) | [`shu.im`](http:
 * Support ActiveRecord and Mongoid
 * Sort results by one field
 * Homophone search, pinyin search
+* Search as pinyin first chars
 * Conditions support
 
 ## Requirements
@@ -77,36 +78,36 @@ You can try the search feature in [`720p.so`](http://720p.so) | [`shu.im`](http:
     class Post
       include Mongoid::Document
       include Redis::Search
-  
+
       field :title
       field :body
       field :hits
-  
+
       belongs_to :user
       belongs_to :category
-  
+
       redis_search_index(:title_field => :title,
                          :score_field => :hits,
                          :condition_fields => [:user_id, :category_id],
                          :ext_fields => [:category_name])
-  
+
       def category_name
         self.category.name
       end
     end
     ```
-    
+
     ```ruby
     class User
       include Mongoid::Document
       include Redis::Search
-      
+
       field :name
-	  field :alias_names, :type => Array
+	    field :alias_names, :type => Array
       field :tagline
       field :email
       field :followers_count
-      
+
       redis_search_index(:title_field => :name,
 		                 :alias_field => :alias_names,
                          :prefix_index_enable => true,
@@ -121,7 +122,7 @@ You can try the search feature in [`720p.so`](http://720p.so) | [`shu.im`](http:
       def index
         Redis::Search.query("Post", params[:q], :conditions => {:user_id => 12})
       end
-      
+
       # GET /search_users?q=j
       def search_users
         Redis::Search.complete("Post", params[:q], :conditions => {:user_id => 12, :category_id => 4})
