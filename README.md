@@ -40,7 +40,7 @@ You can try the search feature in [`720p.so`](http://720p.so) | [`shu.im`](http:
     # add rmmseg if you need search by segment words
     gem 'rmmseg-cpp-huacnlee', '0.2.9'
     gem 'redis-namespace','~> 1.1.0'
-    gem 'redis-search', '0.8.0'
+    gem 'redis-search', '0.9.0'
     ```
 
     ```bash
