@@ -35,11 +35,8 @@ You can try the search feature in [`720p.so`](http://720p.so) | [`shu.im`](http:
 1. In Rails application Gemfile
 
     ```ruby
-    gem 'redis','>= 2.1.1'
     gem 'chinese_pinyin', '0.4.1'
-    # add rmmseg if you need search by segment words
     gem 'rmmseg-cpp-huacnlee', '0.2.9'
-    gem 'redis-namespace','~> 1.1.0'
     gem 'redis-search', '0.9.0'
     ```
 
