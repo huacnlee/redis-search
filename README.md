@@ -10,6 +10,8 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 
 You can try the search feature in [`720p.so`](http://720p.so) | [`shu.im`](http://shu.im)
 
+And there is an  [Example App](https://github.com/huacnlee/redis-search-example) to show you how to use redis-search.
+
 ## Master Status
 
 [![CI Status](https://secure.travis-ci.org/huacnlee/redis-search.png)](http://travis-ci.org/huacnlee/redis-search)
@@ -137,7 +139,8 @@ $ rake redis_search:index
 
 ## Documentation
 
-See [Rdoc.info redis-search](http://rubydoc.info/gems/redis-search)
+* See [Rdoc.info redis-search](http://rubydoc.info/gems/redis-search)
+* [Example App](https://github.com/huacnlee/redis-search-example)
 
 ## Benchmark test
 
