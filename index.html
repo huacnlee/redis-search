@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>redis-search by huacnlee</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>redis-search</h1>
+        <p>High performance real-time search (Support Chinese), indexes store in Redis for Rails application</p>
+
+        <p class="view"><a href="https://github.com/huacnlee/redis-search">View the Project on GitHub <small>huacnlee/redis-search</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/huacnlee/redis-search/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/huacnlee/redis-search/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/huacnlee/redis-search">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>redis-search</h1>
+
+<p>High performance real-time search (Support Chinese), index in Redis for Rails application</p>
+
+<p><a href="https://github.com/huacnlee/redis-search/wiki/Usage-in-Chinese">中文介绍和使用说明</a></p>
+
+<h2>Demo</h2>
+
+<p><img src="http://l.ruby-china.org/photo/34368688ee1c1928c2841eb2f41306ec.png" alt=""></p>
+
+<p>You can try the search feature in <a href="http://720p.so"><code>720p.so</code></a> | <a href="http://shu.im"><code>shu.im</code></a></p>
+
+<p>And there is an  <a href="https://github.com/huacnlee/redis-search-example">Example App</a> to show you how to use redis-search.</p>
+
+<h2>Master Status</h2>
+
+<p><a href="http://travis-ci.org/huacnlee/redis-search"><img src="https://secure.travis-ci.org/huacnlee/redis-search.png" alt="CI Status"></a></p>
+
+<h2>Features</h2>
+
+<ul>
+<li>Real-time search</li>
+<li>High performance</li>
+<li>Segment words search and prefix match search</li>
+<li>Support match with alias</li>
+<li>Support ActiveRecord and Mongoid</li>
+<li>Sort results by one field</li>
+<li>Homophone search, pinyin search</li>
+<li>Search as pinyin first chars</li>
+<li>Conditions support</li>
+</ul><h2>Requirements</h2>
+
+<ul>
+<li>Redis 2.2+</li>
+</ul><h2>Install</h2>
+
+<ol>
+<li>
+<p>In Rails application Gemfile</p>
+
+<div class="highlight"><pre><span class="n">gem</span> <span class="s1">'chinese_pinyin'</span><span class="p">,</span> <span class="s1">'0.4.1'</span>
+<span class="n">gem</span> <span class="s1">'rmmseg-cpp-huacnlee'</span><span class="p">,</span> <span class="s1">'0.2.9'</span>
+<span class="n">gem</span> <span class="s1">'redis-search'</span><span class="p">,</span> <span class="s1">'0.9.0'</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="nv">$ </span>bundle install
+</pre></div>
+</li>
+</ol><h2>Configure</h2>
+
+<ul>
+<li>
+<p>Create file in: config/initializers/redis_search.rb</p>
+
+<div class="highlight"><pre><span class="nb">require</span> <span class="s2">"redis"</span>
+<span class="nb">require</span> <span class="s2">"redis-namespace"</span>
+<span class="nb">require</span> <span class="s2">"redis-search"</span>
+<span class="c1"># don't forget change namespace</span>
+<span class="n">redis</span> <span class="o">=</span> <span class="no">Redis</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:host</span> <span class="o">=&gt;</span> <span class="s2">"127.0.0.1"</span><span class="p">,</span><span class="ss">:port</span> <span class="o">=&gt;</span> <span class="s2">"6379"</span><span class="p">)</span>
+<span class="c1"># We suggest you use a special db in Redis, when you need to clear all data, you can use flushdb command to clear them.</span>
+<span class="n">redis</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="c1"># Give a special namespace as prefix for Redis key, when your have more than one project used redis-search, this config will make them work fine.</span>
+<span class="n">redis</span> <span class="o">=</span> <span class="no">Redis</span><span class="o">::</span><span class="no">Namespace</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">"your_app_name:redis_search"</span><span class="p">,</span> <span class="ss">:redis</span> <span class="o">=&gt;</span> <span class="n">redis</span><span class="p">)</span>
+<span class="no">Redis</span><span class="o">::</span><span class="no">Search</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">redis</span> <span class="o">=</span> <span class="n">redis</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">complete_max_length</span> <span class="o">=</span> <span class="mi">100</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">pinyin_match</span> <span class="o">=</span> <span class="kp">true</span>
+  <span class="c1"># use rmmseg, true to disable it, it can save memroy</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">disable_rmmseg</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="k">end</span>
+</pre></div>
+</li>
+</ul><h2>Usage</h2>
+
+<ul>
+<li>
+<p>Bind Redis::Search callback event, it will to rebuild search indexes when data create or update.</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Post</span>
+  <span class="kp">include</span> <span class="no">Mongoid</span><span class="o">::</span><span class="no">Document</span>
+  <span class="kp">include</span> <span class="no">Redis</span><span class="o">::</span><span class="no">Search</span>
+
+  <span class="n">field</span> <span class="ss">:title</span>
+  <span class="n">field</span> <span class="ss">:body</span>
+  <span class="n">field</span> <span class="ss">:hits</span>
+
+  <span class="n">belongs_to</span> <span class="ss">:user</span>
+  <span class="n">belongs_to</span> <span class="ss">:category</span>
+
+  <span class="n">redis_search_index</span><span class="p">(</span><span class="ss">:title_field</span> <span class="o">=&gt;</span> <span class="ss">:title</span><span class="p">,</span>
+                     <span class="ss">:score_field</span> <span class="o">=&gt;</span> <span class="ss">:hits</span><span class="p">,</span>
+                     <span class="ss">:condition_fields</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="ss">:user_id</span><span class="p">,</span> <span class="ss">:category_id</span><span class="o">]</span><span class="p">,</span>
+                     <span class="ss">:ext_fields</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="ss">:category_name</span><span class="o">]</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">category_name</span>
+    <span class="nb">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">name</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">User</span>
+  <span class="kp">include</span> <span class="no">Mongoid</span><span class="o">::</span><span class="no">Document</span>
+  <span class="kp">include</span> <span class="no">Redis</span><span class="o">::</span><span class="no">Search</span>
+
+  <span class="n">field</span> <span class="ss">:name</span>
+    <span class="n">field</span> <span class="ss">:alias_names</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="nb">Array</span>
+  <span class="n">field</span> <span class="ss">:tagline</span>
+  <span class="n">field</span> <span class="ss">:email</span>
+  <span class="n">field</span> <span class="ss">:followers_count</span>
+
+  <span class="n">redis_search_index</span><span class="p">(</span><span class="ss">:title_field</span> <span class="o">=&gt;</span> <span class="ss">:name</span><span class="p">,</span>
+                     <span class="ss">:alias_field</span> <span class="o">=&gt;</span> <span class="ss">:alias_names</span><span class="p">,</span>
+                     <span class="ss">:prefix_index_enable</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">,</span>
+                     <span class="ss">:score_field</span> <span class="o">=&gt;</span> <span class="ss">:followers_count</span><span class="p">,</span>
+                     <span class="ss">:ext_fields</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="ss">:email</span><span class="p">,</span><span class="ss">:tagline</span><span class="o">]</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">SearchController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="c1"># GET /searchs?q=title</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="no">Redis</span><span class="o">::</span><span class="no">Search</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">"Post"</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:q</span><span class="o">]</span><span class="p">,</span> <span class="ss">:conditions</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">:user_id</span> <span class="o">=&gt;</span> <span class="mi">12</span><span class="p">})</span>
+  <span class="k">end</span>
+
+  <span class="c1"># GET /search_users?q=j</span>
+  <span class="k">def</span> <span class="nf">search_users</span>
+    <span class="no">Redis</span><span class="o">::</span><span class="no">Search</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="s2">"Post"</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:q</span><span class="o">]</span><span class="p">,</span> <span class="ss">:conditions</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">:user_id</span> <span class="o">=&gt;</span> <span class="mi">12</span><span class="p">,</span> <span class="ss">:category_id</span> <span class="o">=&gt;</span> <span class="mi">4</span><span class="p">})</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</li>
+</ul><h2>Index data to Redis</h2>
+
+<p>If you are first install it in you old project, or your Redis cache lose, you can use this command to rebuild indexes.</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>rake redis_search:index
+</pre></div>
+
+<h2>Documentation</h2>
+
+<ul>
+<li>See <a href="http://rubydoc.info/gems/redis-search">Rdoc.info redis-search</a>
+</li>
+<li><a href="https://github.com/huacnlee/redis-search-example">Example App</a></li>
+</ul><h2>Benchmark test</h2>
+
+<p>You can run the rake command (see Rakefile) to make test.
+There is my performance test result.</p>
+
+<ul>
+<li><a href="https://gist.github.com/1150933">https://gist.github.com/1150933</a></li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/huacnlee">huacnlee</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-9745660-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
