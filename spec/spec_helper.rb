@@ -29,7 +29,7 @@ end
 
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
-  config.connect_to(database_id)
+  config.master = Mongo::Connection.new.db(database_id)
 end
 
 require "models"
