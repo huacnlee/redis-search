@@ -18,6 +18,10 @@ class Redis
         ext_fields = options[:ext_fields] || []
         score_field = options[:score_field] || :created_at
         condition_fields = options[:condition_fields] || []
+        if RUBY_VERSION.start_with?('1.8')
+          condition_fields =  "[#{condition_fields.collect { |c| "'#{c}'" }.join(',')}]"
+        end
+        
         # Add score field to ext_fields
         ext_fields |= [score_field]
         # Add condition fields to ext_fields
@@ -52,7 +56,7 @@ class Redis
                                   :id => self.id, 
                                   :exts => self.redis_search_fields_to_hash(#{ext_fields.inspect}), 
                                   :type => self.class.to_s,
-                                  :condition_fields =>#{RUBY_VERSION.start_with?('1.8')? '['+condition_fields.collect{|c| "'#{c}'"}.join(',')+']' : condition_fields},
+                                  :condition_fields => #{condition_fields},
                                   :score => self.#{score_field}.to_i,
                                   :prefix_index_enable => #{prefix_index_enable})
             s.save
