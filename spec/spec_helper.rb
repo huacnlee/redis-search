@@ -36,12 +36,7 @@ require "models"
 
 # Config Redis::Search
 redis_config = YAML.load_file(File.join(File.dirname(__FILE__),"redis.yml"))['test']
-if !redis_config['uri'].blank?
-  uri = URI.parse(redis_config['uri'])
-  $redis = Redis.new(:host => uri.host,:port => uri.port, :password => uri.password)
-else
-  $redis = Redis.new(:host => redis_config['host'],:port => redis_config['port'])
-end
+$redis = Redis.new(:host => redis_config['host'],:port => redis_config['port'])
 $redis = Redis::Namespace.new("redis_search_test", :redis => $redis)
 Redis::Search.configure do |config|
   config.redis = $redis

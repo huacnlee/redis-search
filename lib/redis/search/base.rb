@@ -17,15 +17,15 @@ class Redis
         prefix_index_enable = options[:prefix_index_enable] || false
         ext_fields = options[:ext_fields] || []
         score_field = options[:score_field] || :created_at
-        condition_fields = options[:condition_fields] || []
-        if RUBY_VERSION.start_with?('1.8')
-          condition_fields =  "[#{condition_fields.collect { |c| "'#{c}'" }.join(',')}]"
-        end
-        
+        condition_fields = options[:condition_fields] || []        
         # Add score field to ext_fields
         ext_fields |= [score_field]
         # Add condition fields to ext_fields
         ext_fields |= condition_fields
+        
+        if RUBY_VERSION.start_with?('1.8')
+          condition_fields =  "[#{condition_fields.collect { |c| "'#{c}'" }.join(',')}]"
+        end
         
         # store Model name to indexed_models for Rake tasks
         Search.indexed_models = [] if Search.indexed_models == nil
