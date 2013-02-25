@@ -14,24 +14,7 @@ require "mongoid"
 require "mocha"
 require "uri"
 
-# These environment variables can be set if wanting to test against a database
-# that is not on the local machine.
-ENV["MONGOID_SPEC_HOST"] ||= "localhost"
-ENV["MONGOID_SPEC_PORT"] ||= "27017"
-
-# These are used when creating any connection in the test suite.
-HOST = ENV["MONGOID_SPEC_HOST"]
-PORT = ENV["MONGOID_SPEC_PORT"].to_i
-
-def database_id
-  ENV["CI"] ? "redis_search_#{Process.pid}" : "redis_search_test"
-end
-
-# Set the database that the spec suite connects to.
-Mongoid.configure do |config|
-  config.master = Mongo::Connection.new.db(database_id)
-end
-
+Mongoid.load!(File.join(File.dirname(__FILE__),"mongoid.yml"),"production")
 require "models"
 
 # Config Redis::Search

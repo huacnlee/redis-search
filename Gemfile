@@ -1,4 +1,4 @@
-source :rubygems
+source "http://rubygems.org"
 gemspec
 gem "rake"
 group :test do
@@ -6,8 +6,7 @@ group :test do
   gem 'redis'
   gem "redis-namespace"
   gem "rmmseg-cpp-huacnlee"
-  gem "bson_ext"
-  gem 'mongoid', "2.4.5"
+  gem 'mongoid', "3.1.1"
   gem 'rspec'
   gem 'mocha'
 end
