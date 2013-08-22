@@ -148,3 +148,8 @@ You can run the rake command (see Rakefile) to make test.
 There is my performance test result.
 
 * [https://gist.github.com/1150933](https://gist.github.com/1150933)
+
+
+## License
+
+* [Apache V2](http://choosealicense.com/licenses/nses/apache)
