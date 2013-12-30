@@ -1,5 +1,5 @@
 # coding: utf-8
-require 'chinese_pinyin'
+require 'ruby-pinyin'
 class Redis
   module Search
     # use rmmseg to split words
@@ -176,7 +176,7 @@ class Redis
     protected
       def self.split_pinyin(text)
         # Pinyin search split as pinyin again
-        _split(Pinyin.t(text))
+        _split(PinYin.sentence(text))
       end
   
     private

@@ -37,8 +37,7 @@ And there is an  [Example App](https://github.com/huacnlee/redis-search-example)
 1. In Rails application Gemfile
 
     ```ruby
-    gem 'chinese_pinyin', '0.4.1'
-    gem 'rmmseg-cpp-huacnlee', '0.2.9'
+    gem 'ruby-pinyin', '0.3.0'
     gem 'redis-search', '0.9.0'
     ```
 
