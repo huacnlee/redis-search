@@ -101,13 +101,13 @@ And there is an  [Example App](https://github.com/huacnlee/redis-search-example)
       include Redis::Search
 
       field :name
-	    field :alias_names, :type => Array
+      field :alias_names, :type => Array
       field :tagline
       field :email
       field :followers_count
 
       redis_search_index(:title_field => :name,
-		                 :alias_field => :alias_names,
+                     :alias_field => :alias_names,
                          :prefix_index_enable => true,
                          :score_field => :followers_count,
                          :ext_fields => [:email,:tagline])

@@ -1,3 +1,6 @@
+## 0.9.1 / 2013-12-30
+
+  * Add polyphone support, use [ruby-pinyin](https://github.com/janx/ruby-pinyin) to instead [chinese_pinyin](https://github.com/flyerhzm/chinese_pinyin); 
 
 ## 0.9.0 / 2012-07-20
 
