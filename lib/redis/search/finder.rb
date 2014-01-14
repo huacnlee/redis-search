@@ -1,7 +1,6 @@
 # coding: utf-8
-require 'ruby-pinyin'
 class Redis
-  module Search
+  module Search    
     # use rmmseg to split words
     def self.split(text)
       _split(text)

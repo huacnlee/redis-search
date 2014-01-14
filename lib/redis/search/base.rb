@@ -2,6 +2,8 @@
 
 class Redis
   module Search
+    autoload :PinYin, 'ruby-pinyin'
+        
     extend ::ActiveSupport::Concern
 
     module ClassMethods

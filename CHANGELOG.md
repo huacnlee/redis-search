@@ -1,3 +1,7 @@
+## 0.9.2 / 2014-1-14
+
+  * ruby-pinyin with autoload. 
+
 ## 0.9.1 / 2013-12-30
 
   * Add polyphone support, use [ruby-pinyin](https://github.com/janx/ruby-pinyin) to instead [chinese_pinyin](https://github.com/flyerhzm/chinese_pinyin); 
