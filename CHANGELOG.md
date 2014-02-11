@@ -1,3 +1,7 @@
+## 0.9.4 / 2014-2-11
+
+  * Fix bug for save faild when title it was nil.
+
 ## 0.9.3 / 2014-2-11
 
   * Fix words split bug.
