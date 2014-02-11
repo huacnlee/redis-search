@@ -188,6 +188,7 @@ describe "Redis::Search Finders" do
 
   describe "Segment words" do
     it "does split words method can work fine." do
+      Redis::Search.split(nil).should == []
       Redis::Search.split("Ruby on Rails").should == ["Ruby","on","Rails"]
       Redis::Search.split("如何掌控自己的学习和生活").collect { |t| t.force_encoding("utf-8") }.should == (["如何", "掌控", "自己的","学习", "和", "生活"])
     end
