@@ -1,3 +1,7 @@
+## 0.9.3 / 2014-2-11
+
+  * Fix words split bug.
+  
 ## 0.9.2 / 2014-1-14
 
   * ruby-pinyin with autoload. 
