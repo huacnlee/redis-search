@@ -70,6 +70,7 @@ class Redis
           
           def redis_search_index_delete(titles)
             titles.uniq.each do |title|
+              next if title.blank?
               Search::Index.remove(:id => self.id, :title => title, :type => self.class.to_s)
             end
             true

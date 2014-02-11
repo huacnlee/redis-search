@@ -77,5 +77,12 @@ describe "Redis::Search indexing" do
       User.destroy_all(:conditions => { '_id' => @user.id})
       Redis::Search.complete("User","张三丰").count.should == 0
     end
+    
+    it "will not faild when title it was nil" do
+      @user = User.create(:email => "zsf@gmail.com", :name => nil, :score => 100, :password => "123456")
+      @user.name = "foo"
+      @user.save
+      Redis::Search.complete("User","foo").count.should == 1
+    end
   end
 end
