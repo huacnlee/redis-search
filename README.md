@@ -70,7 +70,7 @@ And there is an  [Example App](https://github.com/huacnlee/redis-search-example)
 
 ## Usage
 
-* Bind Redis::Search callback event, it will to rebuild search indexes when data create or update.
+* Bind Redis::Search callback event, it will to rebuild search indices when data create or update.
 
     ```ruby
     class Post
@@ -130,7 +130,7 @@ And there is an  [Example App](https://github.com/huacnlee/redis-search-example)
 
 ## Index data to Redis
 
-If you are first install it in you old project, or your Redis cache lose, you can use this command to rebuild indexes.
+If you are first install it in you old project, or your Redis cache lose, you can use this command to rebuild indices.
 
 ```bash
 $ rake redis_search:index
