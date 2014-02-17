@@ -1,3 +1,8 @@
+## 0.9.5 / 2014-2-17
+
+  * Fix an index clean bug;
+  * Fix bug on alias value is nil;
+
 ## 0.9.4 / 2014-2-11
 
   * Fix bug for save faild when title it was nil.
