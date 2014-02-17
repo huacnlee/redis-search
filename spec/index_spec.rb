@@ -31,6 +31,10 @@ describe "Redis::Search indexing" do
       Redis::Search.complete("User","h").count.should == 1
       Redis::Search.complete("User","hh").count.should == 1
     end
+    
+    it "should work when alias field value is nil" do
+      User.create(:email => "dhh@gmail.com", :name => "dhh", alias: nil, :score => 10)
+    end
   end
 
   describe "Updating" do

@@ -45,7 +45,7 @@ class Redis
           
           def redis_search_alias_value(field)
             return [] if field.blank? or field == "_was"
-            val = instance_eval("self.\#{field}").clone
+            val = (instance_eval("self.\#{field}") || "").clone
             return [] if !val.class.in?([String,Array])
             if val.is_a?(String)
               val = val.to_s.split(",")
