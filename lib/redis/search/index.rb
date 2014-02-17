@@ -51,10 +51,11 @@ class Redis
       def self.remove(options = {})
         type = options[:type]
         Redis::Search.config.redis.hdel(type,options[:id])
+        Redis::Search.config.redis.del(Search.mk_score_key(type,options[:id]))
+
         words = Search::Index.split_words_for_index(options[:title])
         words.each do |word|
           Redis::Search.config.redis.srem(Search.mk_sets_key(type,word), options[:id])
-          Redis::Search.config.redis.del(Search.mk_score_key(type,options[:id]))
         end
 
         # remove set for prefix index key
