@@ -145,9 +145,7 @@ class Redis
             pinyin_words = pinyin_words.collect { |w| Search.mk_sets_key(type,w) }
             pinyin_words += condition_keys
             temp_sunion_key = "tmpsunionstore:#{words.join("+")}"
-            if Search.config.pinyin_match
-              temp_pinyin_store_key = "tmpinterstore:#{pinyin_words.join("+")}"
-            end
+            temp_pinyin_store_key = "tmpinterstore:#{pinyin_words.join("+")}"
             # 找出拼音的
             Redis::Search.config.redis.sinterstore(temp_pinyin_store_key,*pinyin_words)
             # 合并中文和拼音的搜索结果
