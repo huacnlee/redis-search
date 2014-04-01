@@ -38,7 +38,7 @@ And there is an  [Example App](https://github.com/huacnlee/redis-search-example)
 
     ```ruby
     gem 'ruby-pinyin', '0.3.0'
-    gem 'redis-search', '0.9.0'
+    gem 'redis-search', '0.9.6'
     ```
 
     ```bash
@@ -151,4 +151,4 @@ There is my performance test result.
 
 ## License
 
-* [Apache V2](http://choosealicense.com/licenses/nses/apache)
+* MIT

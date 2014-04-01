@@ -1,13 +1,13 @@
 # coding: utf-8
 Gem::Specification.new do |s|
   s.name        = "redis-search"
-  s.version     = "0.9.5"
+  s.version     = "0.9.6"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Jason Lee"]
   s.email       = ["huacnlee@gmail.com"]
   s.homepage    = "http://github.com/huacnlee/redis-search"
-  s.summary     = "High performance real-time search (Support Chinese), index in Redis for Rails application."
-  s.description = "High performance real-time search (Support Chinese), index in Redis for Rails application. "
+  s.summary     = "High performance real-time search (Support Chinese), indexes store in Redis for Rails applications."
+  s.description = "High performance real-time search (Support Chinese), indexes store in Redis for Rails applications. "
   s.license     = 'MIT'
   s.required_rubygems_version = ">= 1.3.6"
 

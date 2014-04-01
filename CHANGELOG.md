@@ -1,3 +1,9 @@
+## 0.9.6 / 2014-4-1
+
+  * Performance improve for create index (2.7x faster than previous, [Benchmark results](https://gist.github.com/huacnlee/9907235)). 
+  * Refactor codes.
+  * Require redis gem version upto 3.0.0+;
+
 ## 0.9.5 / 2014-2-17
 
   * Fix an index clean bug;
