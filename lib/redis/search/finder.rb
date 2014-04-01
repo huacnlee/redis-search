@@ -134,25 +134,27 @@ class Redis
 
         if words.length > 1
           if !self.config.redis.exists(temp_store_key)
-            # 将多个词语组合对比，得到交集，并存入临时区域
-            self.config.redis.sinterstore(temp_store_key,*words)
-            # 将临时搜索设为1天后自动清除
-            self.config.redis.expire(temp_store_key,86400)
-
-            # 拼音搜索
-            if self.config.pinyin_match
-              pinyin_words = self.split_pinyin(text)
-              pinyin_words = pinyin_words.collect { |w| self.mk_sets_key(type,w) }
-              pinyin_words += condition_keys
-              temp_sunion_key = "tmpsunionstore:#{words.join("+")}"
-              temp_pinyin_store_key = "tmpinterstore:#{pinyin_words.join("+")}"
-              # 找出拼音的
-              self.config.redis.sinterstore(temp_pinyin_store_key,*pinyin_words)
-              # 合并中文和拼音的搜索结果
-              self.config.redis.sunionstore(temp_sunion_key,*[temp_store_key,temp_pinyin_store_key])
+            self.config.redis.pipelined do
+              # 将多个词语组合对比，得到交集，并存入临时区域
+              self.config.redis.sinterstore(temp_store_key,*words)
               # 将临时搜索设为1天后自动清除
-              self.config.redis.expire(temp_pinyin_store_key,86400)
-              self.config.redis.expire(temp_sunion_key,86400)
+              self.config.redis.expire(temp_store_key,86400)
+
+              # 拼音搜索
+              if self.config.pinyin_match
+                pinyin_words = self.split_pinyin(text)
+                pinyin_words = pinyin_words.collect { |w| self.mk_sets_key(type,w) }
+                pinyin_words += condition_keys
+                temp_sunion_key = "tmpsunionstore:#{words.join("+")}"
+                temp_pinyin_store_key = "tmpinterstore:#{pinyin_words.join("+")}"
+                # 找出拼音的
+                self.config.redis.sinterstore(temp_pinyin_store_key,*pinyin_words)
+                # 合并中文和拼音的搜索结果
+                self.config.redis.sunionstore(temp_sunion_key,*[temp_store_key,temp_pinyin_store_key])
+                # 将临时搜索设为1天后自动清除
+                self.config.redis.expire(temp_pinyin_store_key,86400)
+                self.config.redis.expire(temp_sunion_key,86400)
+              end
               temp_store_key = temp_sunion_key
             end
           end
