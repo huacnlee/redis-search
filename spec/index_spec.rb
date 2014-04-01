@@ -31,7 +31,7 @@ describe "Redis::Search indexing" do
       Redis::Search.complete("User","h").count.should == 1
       Redis::Search.complete("User","hh").count.should == 1
     end
-    
+
     it "should work when alias field value is nil" do
       User.create(:email => "dhh@gmail.com", :name => "dhh", alias: nil, :score => 10)
     end
@@ -81,7 +81,7 @@ describe "Redis::Search indexing" do
       User.destroy_all(:conditions => { '_id' => @user.id})
       Redis::Search.complete("User","张三丰").count.should == 0
     end
-    
+
     it "will not faild when title it was nil" do
       @user = User.create(:email => "zsf@gmail.com", :name => nil, :score => 100, :password => "123456")
       @user.name = "foo"

@@ -1,27 +1,30 @@
 class Redis
   module Search
     class Index
-      attr_accessor :type, :title, :id,:score, :aliases, :exts, :condition_fields, :prefix_index_enable
-      
+      attr_accessor :type, :title, :id, :score, :aliases, :exts, :condition_fields, :prefix_index_enable
+
       class << self
         def redis
           Redis::Search.config.redis
         end
-        
+
         def remove(options = {})
           type = options[:type]
-          self.redis.hdel(type,options[:id])
-          self.redis.del(Search.mk_score_key(type,options[:id]))
 
-          words = Search::Index.split_words_for_index(options[:title])
-          words.each do |word|
-            self.redis.srem(Search.mk_sets_key(type,word), options[:id])
+          self.redis.pipelined do
+            self.redis.hdel(type,options[:id])
+            self.redis.del(Search.mk_score_key(type,options[:id]))
+
+            words = self.split_words_for_index(options[:title])
+            words.each do |word|
+              self.redis.srem(Search.mk_sets_key(type,word), options[:id])
+            end
+
+            # remove set for prefix index key
+            self.redis.srem(Search.mk_sets_key(type,options[:title]),options[:id])
           end
-
-          # remove set for prefix index key
-          self.redis.srem(Search.mk_sets_key(type,options[:title]),options[:id])
         end
-        
+
         def split_words_for_index(title)
           words = Search.split(title)
           if Search.config.pinyin_match
@@ -35,7 +38,7 @@ class Redis
           end
           words.uniq
         end
-        
+
         def bm
           t1 = Time.now
           yield
@@ -43,52 +46,52 @@ class Redis
           puts "spend (#{t2 - t1}s)"
         end
       end # end class << self
-      
+
       def redis
         self.class.redis
       end
-      
+
       def initialize(options = {})
         # default data
-        self.condition_fields = []
-        self.exts = []
-        self.aliases = []
-        self.prefix_index_enable = false
+        @condition_fields    = []
+        @exts                = []
+        @aliases             = []
+        @prefix_index_enable = false
 
         # set attributes value from params
         options.keys.each do |k|
           self.send("#{k}=", options[k])
         end
-        self.aliases << self.title
-        self.aliases.uniq!
+        @aliases << self.title
+        @aliases.uniq!
       end
 
       def save
-        return if self.title.blank?
-        
+        return if @title.blank?
+
         self.redis.pipelined do
-          data = {:title => self.title, :id => self.id, :type => self.type}
+          data = {:title => @title, :id => @id, :type => @type}
           self.exts.each do |f|
             data[f[0]] = f[1]
           end
 
           # 将原始数据存入 hashes
-          res = self.redis.hset(self.type, self.id, data.to_json)
+          res = self.redis.hset(@type, @id, data.to_json)
 
           # 将目前的编号保存到条件(conditions)字段所创立的索引上面
           self.condition_fields.each do |field|
-            self.redis.sadd(Search.mk_condition_key(self.type,field,data[field.to_sym]), self.id)
+            self.redis.sadd(Search.mk_condition_key(@type,field,data[field.to_sym]), @id)
           end
 
           # score for search sort
-          self.redis.set(Search.mk_score_key(self.type,self.id),self.score)
+          self.redis.set(Search.mk_score_key(@type,@id),@score)
 
           # 保存 sets 索引，以分词的单词为key，用于后面搜索，里面存储 ids
           self.aliases.each do |val|
             words = Search::Index.split_words_for_index(val)
-            return if words.blank?
+            next if words.blank?
             words.each do |word|
-              self.redis.sadd(Search.mk_sets_key(self.type,word), self.id)
+              self.redis.sadd(Search.mk_sets_key(@type,word), @id)
             end
           end
 
@@ -99,25 +102,25 @@ class Redis
 
       private
       def save_prefix_index
-        sorted_set_key = Search.mk_complete_key(self.type)
+        sorted_set_key = Search.mk_complete_key(@type)
         sorted_vals = []
-        
+
         self.aliases.each do |val|
           words = []
           words << val.downcase
-          
-          self.redis.sadd(Search.mk_sets_key(self.type,val), self.id)
-          
+
+          self.redis.sadd(Search.mk_sets_key(@type,val), @id)
+
           if Search.config.pinyin_match
             pinyin_full = Search.split_pinyin(val.downcase)
             pinyin_first = pinyin_full.collect { |p| p[0] }.join("")
             pinyin = pinyin_full.join("")
-            
+
             words << pinyin
             words << pinyin_first
-            
-            self.redis.sadd(Search.mk_sets_key(self.type,pinyin), self.id)
-            
+
+            self.redis.sadd(Search.mk_sets_key(@type,pinyin), @id)
+
             pinyin_full = nil
             pinyin_first = nil
             pinyin = nil
@@ -131,10 +134,10 @@ class Redis
             sorted_vals << [0, "#{word}*"]
           end
         end
-        
+
         self.redis.zadd(sorted_set_key, sorted_vals)
       end
-      
+
     end # end Index
   end
 end

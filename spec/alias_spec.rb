@@ -5,7 +5,7 @@ describe "subject" do
   after(:all) do
     User.destroy_all
   end
-  
+
   it "does something" do
     @user = User.create(:email => "zsf@gmail.com", :name => "称丰田", :alias => ["纹力神","王尔马"], :score => 100, :password => "123456")
     Redis::Search.complete("User","称").count.should == 1

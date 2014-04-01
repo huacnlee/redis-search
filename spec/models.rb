@@ -19,7 +19,7 @@ class Post
   def category_name
     self.category.name if not self.category.blank?
   end
-  
+
   def user_name
     self.user.name if not self.category.blank?
   end
@@ -29,7 +29,6 @@ class User
   include Mongoid::Document
   include Mongoid::Timestamps
   include Redis::Search
-  
 
   field :email
   field :password
@@ -37,7 +36,7 @@ class User
   field :alias, :type => Array, :default => []
   field :score
   field :sex, :type => Integer, :default => 0
-  
+
   has_many :posts
 
   redis_search_index(:title_field => :name,
@@ -48,12 +47,10 @@ class User
                      :ext_fields => [:email])
 end
 
-
 class Category
   include Mongoid::Document
   include Mongoid::Timestamps
   include Redis::Search
-  
 
   field :name
 

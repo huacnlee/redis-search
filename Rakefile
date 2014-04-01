@@ -44,14 +44,20 @@ namespace :benchmark do
     end
   end
   
-  task :index_categories do
+  task :index do
     random = RandomWord.new
+    Redis::Search::Index.new(:type => "CategoryTest",
+                            :title => random.next, 
+                            :id => 0,
+                            :prefix_index_enable => true,
+                            :score => 1).save
+                            
     Benchmark.bm do|bm|
-      bm.report("Index 1,000,000 categories data ") do
-        1_000_000.times do |i|
+      bm.report("Index 1,000 items") do
+        1_000.times do |i|
           Redis::Search::Index.new(:type => "CategoryTest",
                                   :title => random.next, 
-                                  :id => BSON::ObjectId.new,
+                                  :id => i,
                                   :prefix_index_enable => true,
                                   :score => 1).save
         end

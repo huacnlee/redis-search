@@ -11,7 +11,7 @@ describe Redis::Search do
       Redis::Search.config.should respond_to(:complete_max_length)
       Redis::Search.config.should respond_to(:pinyin_match)
     end
-    
+
     it "does befor config has success" do
       Redis::Search.config.redis.should == $redis
       Redis::Search.config.complete_max_length.should == 100
@@ -19,7 +19,7 @@ describe Redis::Search do
       Redis::Search.config.debug.should == false
     end
   end
-  
+
   describe "interfaces" do
     it "does defiend class methods [query,complete,split]" do
       Redis::Search.should respond_to(:query)

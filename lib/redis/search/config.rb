@@ -3,20 +3,20 @@ class Redis
   module Search
     class << self
       attr_accessor :config, :indexed_models
-    
+
       def configure
-        yield self.config ||= Config.new
-        
-        if not self.config.disable_rmmseg
+        yield @config ||= Config.new
+
+        if not @config.disable_rmmseg
           require "rmmseg"
           # loading RMMSeg chinese word dicts.
           RMMSeg::Dictionary.load_dictionaries
         end
       end
     end
-  
+
     class Config
-      # Redis 
+      # Redis
       attr_accessor :redis
       # Debug toggle, default false
       attr_accessor :debug
@@ -32,13 +32,13 @@ class Redis
       attr_accessor :pinyin_match
       # Disable RMMSeg, if you don't need, disable this will save memory. (true|false) default = true
       attr_accessor :disable_rmmseg
-    
+
       def initialize
-        self.debug = false
-        self.redis = nil
-        self.complete_max_length = 100
-        self.pinyin_match = false
-        self.disable_rmmseg = false        
+        @debug               = false
+        @redis               = nil
+        @complete_max_length = 100
+        @pinyin_match        = false
+        @disable_rmmseg      = false
       end
     end
   end
