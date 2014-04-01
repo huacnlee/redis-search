@@ -21,11 +21,13 @@ namespace :redis_search do
           end
         end
       elsif klass.included_modules.collect { |m| m.to_s }.include?("Mongoid::Document")
-        klass.all.each do |item|
-          item.redis_search_index_create
-    			item = nil
-    			count += 1
-          print "."
+        klass.all.each_slice(1000) do |items|
+          items.each do |item|
+            item.redis_search_index_create
+      			item = nil
+      			count += 1
+            print "."
+          end
         end
       else
         puts "skiped, not support this ORM in current."
