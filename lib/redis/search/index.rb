@@ -35,7 +35,7 @@ class Redis
           end
           words.uniq
         end
-      end
+      end # end class << self
       
       def redis
         self.class.redis
@@ -50,7 +50,7 @@ class Redis
 
         # set attributes value from params
         options.keys.each do |k|
-          eval("self.#{k} = options[k]")
+          self.send("#{k}=", options[k])
         end
         self.aliases << self.title
         self.aliases.uniq!
@@ -88,33 +88,33 @@ class Redis
       end
 
       private
-        def save_prefix_index
-          self.aliases.each do |val|
-            words = []
-            words << val.downcase
-            self.redis.sadd(Search.mk_sets_key(self.type,val), self.id)
-            if Search.config.pinyin_match
-              pinyin_full = Search.split_pinyin(val.downcase)
-              pinyin_first = pinyin_full.collect { |p| p[0] }.join("")
-              pinyin = pinyin_full.join("")
-              words << pinyin
-              words << pinyin_first
-              self.redis.sadd(Search.mk_sets_key(self.type,pinyin), self.id)
-              pinyin_full = nil
-              pinyin_first = nil
-              pinyin = nil
-            end
+      def save_prefix_index
+        self.aliases.each do |val|
+          words = []
+          words << val.downcase
+          self.redis.sadd(Search.mk_sets_key(self.type,val), self.id)
+          if Search.config.pinyin_match
+            pinyin_full = Search.split_pinyin(val.downcase)
+            pinyin_first = pinyin_full.collect { |p| p[0] }.join("")
+            pinyin = pinyin_full.join("")
+            words << pinyin
+            words << pinyin_first
+            self.redis.sadd(Search.mk_sets_key(self.type,pinyin), self.id)
+            pinyin_full = nil
+            pinyin_first = nil
+            pinyin = nil
+          end
 
-            words.each do |word|
-              key = Search.mk_complete_key(self.type)
-              (1..(word.length)).each do |l|
-                prefix = word[0...l]
-                self.redis.zadd(key, 0, prefix)
-              end
-              self.redis.zadd(key, 0, word + "*")
+          words.each do |word|
+            key = Search.mk_complete_key(self.type)
+            (1..(word.length)).each do |l|
+              prefix = word[0...l]
+              self.redis.zadd(key, 0, prefix)
             end
+            self.redis.zadd(key, 0, word + "*")
           end
         end
-    end
+      end
+    end # end Index
   end
 end
