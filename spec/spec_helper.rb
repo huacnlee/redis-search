@@ -37,7 +37,9 @@ RSpec.configure do |config|
     end
     keys = $redis.keys("*")
     if keys.length > 1
-      $redis.del(*keys)
+      keys.each_slice(1000) do |sub_keys|
+        $redis.del(*sub_keys)
+      end
     end
   end
 end
