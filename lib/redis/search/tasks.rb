@@ -11,12 +11,12 @@ namespace :redis_search do
     puts ""
     Redis::Search.indexed_models.each do |klass|
       print "[#{klass.to_s}]"
-      if klass.superclass.to_s == "ActiveRecord::Base"
+      if klass < ActiveRecord::Base
         klass.find_in_batches(:batch_size => 1000) do |items|
           items.each do |item|
             item.redis_search_index_create
-      			item = nil
-      			count += 1
+            item = nil
+            count += 1
             print "."
           end
         end
@@ -24,8 +24,8 @@ namespace :redis_search do
         klass.all.each_slice(1000) do |items|
           items.each do |item|
             item.redis_search_index_create
-      			item = nil
-      			count += 1
+            item = nil
+            count += 1
             print "."
           end
         end
