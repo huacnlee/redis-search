@@ -1,3 +1,4 @@
+# coding: utf-8
 class Redis
   module Search
     class Railtie < ::Rails::Railtie

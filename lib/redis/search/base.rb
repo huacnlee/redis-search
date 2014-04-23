@@ -1,5 +1,4 @@
 # coding: utf-8
-
 class Redis
   module Search
     autoload :PinYin, 'ruby-pinyin'
