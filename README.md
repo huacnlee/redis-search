@@ -136,6 +136,7 @@ If you are first install it in you old project, or your Redis cache lose, you ca
 $ rake redis_search:index
 ```
 
+
 ## Documentation
 
 * See [Rdoc.info redis-search](http://rubydoc.info/gems/redis-search)
