@@ -158,6 +158,7 @@ Customize the batch size:
 $ rake environment redis_search:index DIR=app/models BATCH=100
 ```
 
+
 ## Documentation
 
 * See [Rdoc.info redis-search](http://rubydoc.info/gems/redis-search)
