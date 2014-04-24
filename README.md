@@ -135,13 +135,13 @@ And there is an  [Example App](https://github.com/huacnlee/redis-search-example)
 Redis-Search index data to Redis from your model (pass name as CLASS environment variable).
 
 ```bash
-$ rake environment redis_search:index:model CLASS='MyModel'
+$ rake redis_search:index:model CLASS='MyModel'
 ```
 
 Customize the batch size:
 
 ```bash
-$ rake environment redis_search:index:model CLASS='MyModel' BATCH=100
+$ rake redis_search:index:model CLASS='MyModel' BATCH=100
 ```
 
 ### All Models
@@ -149,13 +149,13 @@ $ rake environment redis_search:index:model CLASS='MyModel' BATCH=100
 Redis-Search all index data to Redis from `app/models` (or use DIR environment variabl).
 
 ```bash
-$ rake environment redis_search:index DIR=app/models
+$ rake redis_search:index DIR=app/models
 ```
 
 Customize the batch size:
 
 ```bash
-$ rake environment redis_search:index DIR=app/models BATCH=100
+$ rake redis_search:index DIR=app/models BATCH=100
 ```
 
 ## Documentation
