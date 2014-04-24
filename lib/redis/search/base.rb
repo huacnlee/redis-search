@@ -129,6 +129,31 @@ class Redis
           end
         )
       end
+
+      def redis_search_index_batch_create(batch_size = 1000, progressbar = false)
+        count = 0
+        if self.ancestors.collect { |klass| klass.to_s }.include?("ActiveRecord::Base")
+          find_in_batches(:batch_size => batch_size) do |items|
+            items.each do |item|
+              item.redis_search_index_create
+              count += 1
+              print "." if progressbar
+            end
+          end
+        elsif self.included_modules.collect { |m| m.to_s }.include?("Mongoid::Document")
+          all.each_slice(batch_size) do |items|
+            items.each do |item|
+              item.redis_search_index_create
+              count += 1
+              print "." if progressbar
+            end
+          end
+        else
+          puts "skiped, not support this ORM in current."
+        end
+
+        count
+      end
     end
   end
 end
