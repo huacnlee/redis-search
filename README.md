@@ -37,8 +37,8 @@ And there is an  [Example App](https://github.com/huacnlee/redis-search-example)
 1. In Rails application Gemfile
 
     ```ruby
-    gem 'ruby-pinyin', '0.3.0'
-    gem 'redis-search', '0.9.6'
+    gem 'ruby-pinyin'
+    gem 'redis-search'
     ```
 
     ```bash
