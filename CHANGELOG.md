@@ -1,6 +1,6 @@
 ## Master
 
-  * Break 1.8 support;
+  * No Ruby 1.8 support;
   * refactor large method redis_search_index, now class who included Redis::Search will have `redis_search_options` method;
   * Ruby 1.9 new hash syntax;
   
