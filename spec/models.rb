@@ -58,3 +58,23 @@ class Category
                      prefix_index_enable: true,
                      ext_fields: [])
 end
+
+class Admin < User
+end
+
+class Company
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include Redis::Search
+
+  field :name
+
+  redis_search_index(:title_field => :name,
+                     :prefix_index_enable => true,
+                     :class_name => 'Company')
+
+end
+
+class Firm < Company
+
+end

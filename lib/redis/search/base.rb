@@ -37,7 +37,7 @@ class Redis
                             aliases: self.redis_search_alias_value(self.redis_search_options[:alias_field]),
                             id: self.id,
                             exts: self.redis_search_fields_to_hash(self.redis_search_options[:ext_fields]),
-                            type: self.class.to_s,
+                            type: self.redis_search_options[:class_name] || self.class.name,
                             condition_fields: self.redis_search_options[:condition_fields],
                             score: self.send(self.redis_search_options[:score_field]).to_i,
                             prefix_index_enable: self.redis_search_options[:prefix_index_enable])
@@ -125,6 +125,7 @@ class Redis
         opts[:ext_fields] ||= []
         opts[:score_field] ||= :created_at
         opts[:condition_fields] ||= []
+        opts[:class_name] ||= nil
 
         # Add score field to ext_fields
         opts[:ext_fields] += [opts[:score_field]]
