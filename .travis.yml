@@ -4,4 +4,4 @@ rvm:
 services:
  - redis-server
  - mongodb
-script: rspec spec
+script: bundle exec rspec spec
