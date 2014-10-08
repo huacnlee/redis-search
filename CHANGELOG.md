@@ -1,8 +1,9 @@
-## Master
+## 0.9.7 / 2014-10-8
 
   * No Ruby 1.8 support;
   * refactor large method redis_search_index, now class who included Redis::Search will have `redis_search_options` method;
   * Ruby 1.9 new hash syntax;
+  * Add `class_name` options to custom Index type with inherit models. [@yesmeck](https://github.com/yesmeck)
 
 ## 0.9.6 / 2014-4-1
 
