@@ -170,7 +170,6 @@ There is my performance test result.
 
 * [https://gist.github.com/1150933](https://gist.github.com/1150933)
 
-
 ## License
 
 * MIT

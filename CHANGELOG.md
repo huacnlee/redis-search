@@ -3,10 +3,10 @@
   * No Ruby 1.8 support;
   * refactor large method redis_search_index, now class who included Redis::Search will have `redis_search_options` method;
   * Ruby 1.9 new hash syntax;
-  
+
 ## 0.9.6 / 2014-4-1
 
-  * Performance improve for create index (2.7x faster than previous, [Benchmark results](https://gist.github.com/huacnlee/9907235)). 
+  * Performance improve for create index (2.7x faster than previous, [Benchmark results](https://gist.github.com/huacnlee/9907235)).
   * Refactor codes.
   * Require redis gem version upto 3.0.0+;
 

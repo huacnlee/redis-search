@@ -7,12 +7,12 @@ class Redis
 
     included do
       cattr_reader :redis_search_options
-      
+
       before_destroy :redis_search_index_before_destroy
       after_update :redis_search_index_after_update
       after_save :redis_search_index_after_save
     end
-    
+
     def redis_search_fields_to_hash(ext_fields)
       exts = {}
       ext_fields.each do |f|
@@ -20,7 +20,7 @@ class Redis
       end
       exts
     end
-    
+
     def redis_search_alias_value(field)
       return [] if field.blank? || field == "_was".freeze
       val = (instance_eval("self.#{field}") || "".freeze).clone
@@ -30,7 +30,7 @@ class Redis
       end
       val
     end
-    
+
     # Rebuild search index with create
     def redis_search_index_create
       s = Search::Index.new(title: self.send(self.redis_search_options[:title_field]),
@@ -46,7 +46,7 @@ class Redis
       s = nil
       true
     end
-    
+
     def redis_search_index_delete(titles)
       titles.uniq!
       titles.each do |title|
@@ -55,7 +55,7 @@ class Redis
       end
       true
     end
-    
+
     def redis_search_index_before_destroy
       titles = []
       titles = redis_search_alias_value(self.redis_search_options[:alias_field])
@@ -64,7 +64,7 @@ class Redis
       redis_search_index_delete(titles)
       true
     end
-    
+
     def redis_search_index_need_reindex
       index_fields_changed = false
       self.redis_search_options[:ext_fields].each do |f|
@@ -74,24 +74,24 @@ class Redis
           Redis::Search.warn("#{self.class.name} model reindex on update need #{field_method} method.")
           next
         end
-        
+
         index_fields_changed = true if instance_eval(field_method)
       end
-      
+
       begin
         if self.send("#{self.redis_search_options[:title_field]}_changed?")
           index_fields_changed = true
         end
-        
+
         if self.send(self.redis_search_options[:alias_field]) || self.send("#{self.redis_search_options[:title_field]}_changed?")
           index_fields_changed = true
         end
       rescue
       end
-      
+
       return index_fields_changed
     end
-    
+
     def redis_search_index_after_update
       if self.redis_search_index_need_reindex
         titles = []
@@ -99,17 +99,17 @@ class Redis
         titles << self.send("#{self.redis_search_options[:title_field]}_was")
         redis_search_index_delete(titles)
       end
-      
+
       true
     end
-    
+
     def redis_search_index_after_save
       if self.redis_search_index_need_reindex || self.new_record?
         self.redis_search_index_create
       end
       true
     end
-    
+
     module ClassMethods
       # Config redis-search index for Model
       # == Params:
@@ -128,14 +128,14 @@ class Redis
 
         # Add score field to ext_fields
         opts[:ext_fields] += [opts[:score_field]]
-        
+
         # Add condition fields to ext_fields
         opts[:ext_fields] += opts[:condition_fields] if opts[:condition_fields].is_a?(Array)
 
         # store Model name to indexed_models for Rake tasks
         Search.indexed_models = [] if Search.indexed_models == nil
         Search.indexed_models << self
-        
+
         class_variable_set("@@redis_search_options".freeze, opts)
       end
 
