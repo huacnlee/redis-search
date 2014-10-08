@@ -107,7 +107,7 @@ And there is an  [Example App](https://github.com/huacnlee/redis-search-example)
       field :followers_count
 
       redis_search_index(:title_field => :name,
-                     :alias_field => :alias_names,
+                         :alias_field => :alias_names,
                          :prefix_index_enable => true,
                          :score_field => :followers_count,
                          :ext_fields => [:email,:tagline])
