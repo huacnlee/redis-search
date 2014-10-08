@@ -20,7 +20,6 @@ class Redis
         ext_fields          = options[:ext_fields] || []
         score_field         = options[:score_field] || :created_at
         condition_fields    = options[:condition_fields] || []
-        type                = options[:type] || self.name
 
         # Add score field to ext_fields
         ext_fields |= [score_field]
@@ -59,7 +58,7 @@ class Redis
                                   :aliases => self.redis_search_alias_value(#{alias_field.inspect}),
                                   :id => self.id,
                                   :exts => self.redis_search_fields_to_hash(#{ext_fields.inspect}),
-                                  :type => #{type},
+                                  :type => self.class.to_s,
                                   :condition_fields => #{condition_fields},
                                   :score => self.#{score_field}.to_i,
                                   :prefix_index_enable => #{prefix_index_enable})

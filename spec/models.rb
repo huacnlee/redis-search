@@ -44,8 +44,7 @@ class User
                      :score_field => :score,
                      :condition_fields => [:sex],
                      :prefix_index_enable => true,
-                     :ext_fields => [:email],
-                     :model_name => 'User')
+                     :ext_fields => [:email])
 end
 
 class Category
@@ -58,7 +57,4 @@ class Category
   redis_search_index(:title_field => :name,
                      :prefix_index_enable => true,
                      :ext_fields => [])
-end
-
-class Admin < User
 end
