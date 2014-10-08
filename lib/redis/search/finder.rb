@@ -19,7 +19,7 @@ class Redis
       # * Redis::Search.complete("Tag","red") => ["Redis", "Redmine"]
       # * Redis::Search.complete("Tag","redi") => ["Redis"]
       def complete(type, w, options = {})
-        limit = options[:limit] || 10
+        limit      = options[:limit] || 10
         conditions = options[:conditions] || []
         return [] if (w.blank? && conditions.blank?) || type.blank?
 
@@ -89,9 +89,9 @@ class Redis
         end
 
         ids = self.config.redis.sort(temp_store_key,
-                                    :limit => [0,limit],
-                                    :by => self.mk_score_key(type,"*"),
-                                    :order => "desc")
+                                     limit: [0,limit],
+                                     by: self.mk_score_key(type,"*"),
+                                     order: "desc")
         return [] if ids.blank?
         self.hmget(type,ids)
       end
@@ -105,10 +105,9 @@ class Redis
       # h3. usage:
       # * Redis::Search.query("Tag","Ruby vs Python")
       def query(type, text, options = {})
-        tm = Time.now
-        result = []
-
-        limit = options[:limit] || 10
+        tm         = Time.now
+        result     = []
+        limit      = options[:limit] || 10
         sort_field = options[:sort_field] || "id"
         conditions = options[:conditions] || []
 
@@ -164,10 +163,10 @@ class Redis
 
         # 根据需要的数量取出 ids
         ids = self.config.redis.sort(temp_store_key,
-                                    :limit => [0,limit],
-                                    :by => self.mk_score_key(type,"*"),
-                                    :order => "desc")
-        result = self.hmget(type,ids, :sort_field => sort_field)
+                                     limit: [0,limit],
+                                     by: self.mk_score_key(type,"*"),
+                                     order: "desc")
+        result = self.hmget(type, ids, sort_field: sort_field)
         self.info("{#{type} : \"#{text}\"} | Time spend: #{Time.now - tm}s")
         result
       end

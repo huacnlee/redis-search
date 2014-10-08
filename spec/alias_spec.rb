@@ -7,7 +7,7 @@ describe "subject" do
   end
 
   it "does something" do
-    @user = User.create(:email => "zsf@gmail.com", :name => "称丰田", :alias => ["纹力神","王尔马"], :score => 100, :password => "123456")
+    @user = User.create(email: "zsf@gmail.com", name: "称丰田", alias: ["纹力神","王尔马"], score: 100, password: "123456")
     Redis::Search.complete("User","称").count.should == 1
     Redis::Search.complete("User","纹").count.should == 1
     Redis::Search.complete("User","王尔").count.should == 1

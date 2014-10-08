@@ -4,17 +4,17 @@ class Post
   include Redis::Search
 
   field :title
-  field :alias, :type => Array, :default => []
+  field :alias, type: Array, default: []
   field :body
   field :hits
 
   belongs_to :user
   belongs_to :category
 
-  redis_search_index(:title_field => :title,
-                     :score_field => :hits,
-                     :condition_fields => [:category_id,:user_id],
-                     :ext_fields => [:category_name,:user_name])
+  redis_search_index(title_field: :title,
+                     score_field: :hits,
+                     condition_fields: [:category_id,:user_id],
+                     ext_fields: [:category_name,:user_name])
 
   def category_name
     self.category.name if not self.category.blank?
@@ -33,18 +33,18 @@ class User
   field :email
   field :password
   field :name
-  field :alias, :type => Array, :default => []
+  field :alias, type: Array, default: []
   field :score
-  field :sex, :type => Integer, :default => 0
+  field :sex, type: Integer, default: 0
 
   has_many :posts
 
-  redis_search_index(:title_field => :name,
-                     :alias_field => :alias,
-                     :score_field => :score,
-                     :condition_fields => [:sex],
-                     :prefix_index_enable => true,
-                     :ext_fields => [:email])
+  redis_search_index(title_field: :name,
+                     alias_field: :alias,
+                     score_field: :score,
+                     condition_fields: [:sex],
+                     prefix_index_enable: true,
+                     ext_fields: [:email])
 end
 
 class Category
@@ -54,7 +54,7 @@ class Category
 
   field :name
 
-  redis_search_index(:title_field => :name,
-                     :prefix_index_enable => true,
-                     :ext_fields => [])
+  redis_search_index(title_field: :name,
+                     prefix_index_enable: true,
+                     ext_fields: [])
 end

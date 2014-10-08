@@ -33,14 +33,14 @@ class Redis
     
     # Rebuild search index with create
     def redis_search_index_create
-      s = Search::Index.new(:title => self.send(self.redis_search_options[:title_field]),
-                            :aliases => self.redis_search_alias_value(self.redis_search_options[:alias_field]),
-                            :id => self.id,
-                            :exts => self.redis_search_fields_to_hash(self.redis_search_options[:ext_fields]),
-                            :type => self.class.to_s,
-                            :condition_fields => self.redis_search_options[:condition_fields],
-                            :score => self.send(self.redis_search_options[:score_field]).to_i,
-                            :prefix_index_enable => self.redis_search_options[:prefix_index_enable])
+      s = Search::Index.new(title: self.send(self.redis_search_options[:title_field]),
+                            aliases: self.redis_search_alias_value(self.redis_search_options[:alias_field]),
+                            id: self.id,
+                            exts: self.redis_search_fields_to_hash(self.redis_search_options[:ext_fields]),
+                            type: self.class.to_s,
+                            condition_fields: self.redis_search_options[:condition_fields],
+                            score: self.send(self.redis_search_options[:score_field]).to_i,
+                            prefix_index_enable: self.redis_search_options[:prefix_index_enable])
       s.save
       # release s
       s = nil
@@ -51,7 +51,7 @@ class Redis
       titles.uniq!
       titles.each do |title|
         next if title.blank?
-        Search::Index.remove(:id => self.id, :title => title, :type => self.class.name)
+        Search::Index.remove(id: self.id, title: title, type: self.class.name)
       end
       true
     end
@@ -68,7 +68,7 @@ class Redis
     def redis_search_index_need_reindex
       index_fields_changed = false
       self.redis_search_options[:ext_fields].each do |f|
-        next if f.to_s == "id"
+        next if f.to_s == "id".freeze
         field_method = "#{f}_changed?"
         if self.methods.index(field_method.to_sym) == nil
           Redis::Search.warn("#{self.class.name} model reindex on update need #{field_method} method.")
@@ -136,12 +136,12 @@ class Redis
         Search.indexed_models = [] if Search.indexed_models == nil
         Search.indexed_models << self
         
-        class_variable_set("@@redis_search_options", opts)
+        class_variable_set("@@redis_search_options".freeze, opts)
       end
 
       def redis_search_index_batch_create(batch_size = 1000, progressbar = false)
         count = 0
-        if self.ancestors.collect { |klass| klass.to_s }.include?("ActiveRecord::Base")
+        if self.ancestors.collect { |klass| klass.to_s }.include?("ActiveRecord::Base".freeze)
           find_in_batches(:batch_size => batch_size) do |items|
             items.each do |item|
               item.redis_search_index_create
@@ -149,7 +149,7 @@ class Redis
               print "." if progressbar
             end
           end
-        elsif self.included_modules.collect { |m| m.to_s }.include?("Mongoid::Document")
+        elsif self.included_modules.collect { |m| m.to_s }.include?("Mongoid::Document".freeze)
           all.each_slice(batch_size) do |items|
             items.each do |item|
               item.redis_search_index_create

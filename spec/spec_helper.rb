@@ -18,8 +18,8 @@ require "models"
 
 # Config Redis::Search
 redis_config = YAML.load_file(File.join(File.dirname(__FILE__),"redis.yml"))['test']
-$redis = Redis.new(:host => redis_config['host'],:port => redis_config['port'])
-$redis = Redis::Namespace.new("redis_search_test", :redis => $redis)
+$redis = Redis.new(host: redis_config['host'],port: redis_config['port'])
+$redis = Redis::Namespace.new("redis_search_test", redis: $redis)
 Redis::Search.configure do |config|
   config.redis = $redis
   config.complete_max_length = 100

@@ -71,7 +71,7 @@ class Redis
         return if @title.blank?
 
         self.redis.pipelined do
-          data = {:title => @title, :id => @id, :type => @type}
+          data = {title: @title, id: @id, type: @type}
           self.exts.each do |f|
             data[f[0]] = f[1]
           end

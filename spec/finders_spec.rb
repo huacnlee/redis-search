@@ -3,36 +3,36 @@ require "spec_helper"
 
 describe "Redis::Search Finders" do
   before :all do
-    @user1 = User.create(:email => "zsf@gmail.com", :sex => 1, :name => "张三丰", :alias => ["张三疯","张麻子"], :score => 100, :password => "123456")
-    @user2 = User.create(:email => "liubei@gmail.com", :sex => 2, :name => "刘备", :score => 200, :password => "abcd")
-    @user3 = User.create(:email => "zicheng.lhs@taobao.com", :sex => 1, :name => "李自成", :score => 20, :password => "dsad")
-    @user4 = User.create(:email => "zhang-wuji@me.com", :sex => 1, :name => "张无忌", :score => 2000, :password => "123456762")
-    @user5 = User.create(:email => "liao.zhang@apple.com", :sex => 0, :name => "张辽", :score => 700, :password => "abcdks")
-    @user6 = User.create(:email => "leo-cheng@gmail.com", :sex => 2, :name => "Leo Peter Cheng", :score => 3, :password => "kdhs")
+    @user1 = User.create(email: "zsf@gmail.com", sex: 1, name: "张三丰", alias: ["张三疯","张麻子"], score: 100, password: "123456")
+    @user2 = User.create(email: "liubei@gmail.com", sex: 2, name: "刘备", score: 200, password: "abcd")
+    @user3 = User.create(email: "zicheng.lhs@taobao.com", sex: 1, name: "李自成", score: 20, password: "dsad")
+    @user4 = User.create(email: "zhang-wuji@me.com", sex: 1, name: "张无忌", score: 2000, password: "123456762")
+    @user5 = User.create(email: "liao.zhang@apple.com", sex: 0, name: "张辽", score: 700, password: "abcdks")
+    @user6 = User.create(email: "leo-cheng@gmail.com", sex: 2, name: "Leo Peter Cheng", score: 3, password: "kdhs")
 
-    @category1 = Category.create(:name => "Programming")
-    @category2 = Category.create(:name => "My live")
+    @category1 = Category.create(name: "Programming")
+    @category2 = Category.create(name: "My live")
 
-    @post1 = Post.create(:user => @user1,
-                          :category => @category1,
-                          :title => "How do I check If a Class already exists in Ruby",
-                          :hits => 32182)
-    @post2 = Post.create(:user => @user3,
-                          :category => @category2,
-                          :title => "新版本上线，采用 Twitter 的 Bootstrap 来设计布局",
-                          :hits => 100)
-    @post3 = Post.create(:user => @user3,
-                          :category => @category1,
-                          :title => "redis-search 高效的 Ruby 搜索插件介绍",
-                          :hits => 2000)
-    @post4 = Post.create(:user => @user2,
-                          :category => @category1,
-                          :title => "What different of Ruby Class and Module?",
-                          :hits => 6721)
-    @post5 = Post.create(:user => @user5,
-                          :category => @category1,
-                          :title => "Redis is a right store way for Ruby on Rails project?",
-                          :hits => 762)
+    @post1 = Post.create(user: @user1,
+                         category: @category1,
+                         title: "How do I check If a Class already exists in Ruby",
+                         hits: 32182)
+    @post2 = Post.create(user: @user3,
+                         category: @category2,
+                         title: "新版本上线，采用 Twitter 的 Bootstrap 来设计布局",
+                         hits: 100)
+    @post3 = Post.create(user: @user3,
+                         category: @category1,
+                         title: "redis-search 高效的 Ruby 搜索插件介绍",
+                         hits: 2000)
+    @post4 = Post.create(user: @user2,
+                         category: @category1,
+                         title: "What different of Ruby Class and Module?",
+                         hits: 6721)
+    @post5 = Post.create(user: @user5,
+                         category: @category1,
+                         title: "Redis is a right store way for Ruby on Rails project?",
+                         hits: 762)
   end
 
   after :all do
@@ -127,14 +127,14 @@ describe "Redis::Search Finders" do
     end
 
     it "does search with conditions" do
-      Redis::Search.complete("User", "l", :conditions => [:sex => 2]).count.should == 2
-      Redis::Search.complete("User", "li", :conditions => [:sex => 2]).count.should == 1
+      Redis::Search.complete("User", "l", conditions: [sex: 2]).count.should == 2
+      Redis::Search.complete("User", "li", conditions: [sex: 2]).count.should == 1
     end
 
     it "does search only by conditions" do
-      Redis::Search.complete("User", "", :conditions => [:sex => 1]).count.should == 3
-      Redis::Search.complete("User", "", :conditions => [:sex => 2]).count.should == 2
-      Redis::Search.complete("User", "", :conditions => [:sex => 0]).count.should == 1
+      Redis::Search.complete("User", "", conditions: [sex: 1]).count.should == 3
+      Redis::Search.complete("User", "", conditions: [sex: 2]).count.should == 2
+      Redis::Search.complete("User", "", conditions: [sex: 0]).count.should == 1
     end
   end
 
@@ -170,19 +170,19 @@ describe "Redis::Search Finders" do
     end
 
     it "does search with a conditions" do
-      Redis::Search.query("Post", "Ruby", :conditions => [:user_id => @user3.id]).count.should == 1
-      Redis::Search.query("Post", "Ruby on Rails", :conditions => [:user_id => @user3.id]).count.should == 0
+      Redis::Search.query("Post", "Ruby", conditions: [user_id: @user3.id]).count.should == 1
+      Redis::Search.query("Post", "Ruby on Rails", conditions: [user_id: @user3.id]).count.should == 0
     end
 
     it "does search with more conditions" do
-      Redis::Search.query("Post", "", :conditions => [:user_id => @user3.id, :category_id => @category1.id]).count.should == 1
-      Redis::Search.query("Post", "Ruby", :conditions => [:user_id => @user3.id, :category_id => @category1.id]).count.should == 1
-      Redis::Search.query("Post", "Ruby", :conditions => [:user_id => @user3.id, :category_id => @category2.id]).count.should == 0
+      Redis::Search.query("Post", "", conditions: [user_id: @user3.id, category_id: @category1.id]).count.should == 1
+      Redis::Search.query("Post", "Ruby", conditions: [user_id: @user3.id, category_id: @category1.id]).count.should == 1
+      Redis::Search.query("Post", "Ruby", conditions: [user_id: @user3.id, category_id: @category2.id]).count.should == 0
     end
 
     it "does search only by conditions" do
-      Redis::Search.query("Post", "", :conditions => [:user_id => @user3.id]).count.should == 2
-      Redis::Search.query("Post", "", :conditions => [:category_id => @category2.id]).count.should == 1
+      Redis::Search.query("Post", "", conditions: [user_id: @user3.id]).count.should == 2
+      Redis::Search.query("Post", "", conditions: [category_id: @category2.id]).count.should == 1
     end
   end
 

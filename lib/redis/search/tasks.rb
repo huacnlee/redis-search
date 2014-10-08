@@ -1,7 +1,7 @@
 # coding: utf-8
 require "redis-search"
 namespace :redis_search do
-  task :index => 'index:all'
+  task index: 'index:all'
 
   namespace :index do
     index_model_desc = <<-DESC.gsub(/      /, '')
@@ -25,7 +25,7 @@ namespace :redis_search do
     DESC
 
     desc index_model_desc
-    task :model => :environment do
+    task model: :environment do
       if ENV['CLASS'].to_s == ''
         puts '='*90, 'USAGE', '='*90, index_model_desc, ""
         exit(1)
@@ -42,7 +42,7 @@ namespace :redis_search do
     end
 
     desc index_all_desc
-    task :all => :environment do
+    task all: :environment do
       tm    = Time.now
       count = 0
       dir   = ENV['DIR'].to_s != '' ? ENV['DIR'] : 'app/models'

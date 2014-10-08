@@ -3,7 +3,7 @@ require "spec_helper"
 
 describe "Redis::Search indexing" do
   before do
-    @user = User.create(:email => "zsf@gmail.com", :name => "张三丰", :score => 100, :password => "123456")
+    @user = User.create(email: "zsf@gmail.com", name: "张三丰", score: 100, password: "123456")
   end
 
   after do
@@ -12,14 +12,14 @@ describe "Redis::Search indexing" do
 
   describe "Creating" do
     it "dose can append index to Redis when use create method" do
-      user1 = User.create(:email => "foo@bar.com", :name => "Foo Bar", :score => 10)
+      user1 = User.create(email: "foo@bar.com", name: "Foo Bar", score: 10)
       Redis::Search.complete("User","Fo").count.should == 1
       Redis::Search.complete("User","Foo").count.should == 1
       Redis::Search.complete("User","Foo Bar")[0]['id'].should == user1.id.to_s
     end
 
     it "does can append index to Redis when new and save" do
-      user2 = User.new(:email => "dhh@gmail.com", :name => "David Heinemeier Hansson", :score => 10)
+      user2 = User.new(email: "dhh@gmail.com", name: "David Heinemeier Hansson", score: 10)
       user2.save
       Redis::Search.complete("User","David Heinemeier Hansson").count.should == 1
       Redis::Search.complete("User","D").count.should == 1
@@ -33,7 +33,7 @@ describe "Redis::Search indexing" do
     end
 
     it "should work when alias field value is nil" do
-      User.create(:email => "dhh@gmail.com", :name => "dhh", alias: nil, :score => 10)
+      User.create(email: "dhh@gmail.com", name: "dhh", alias: nil, score: 10)
     end
   end
 
@@ -50,7 +50,7 @@ describe "Redis::Search indexing" do
 
     it "does can reindex when data changed by update_attributes" do
       Redis::Search.complete("User","张三丰").count.should == 1
-      @user.update_attributes(:name => "张无忌")
+      @user.update_attributes(name: "张无忌")
       Redis::Search.complete("User","张三丰").count.should == 0
       Redis::Search.complete("User","张无忌").count.should == 1
     end
@@ -78,12 +78,12 @@ describe "Redis::Search indexing" do
 
     it "will remove index when deleted by Model.destroy_all with conditions" do
       Redis::Search.complete("User","张三丰").count.should == 1
-      User.destroy_all(:conditions => { '_id' => @user.id})
+      User.destroy_all(conditions: { _id: @user.id})
       Redis::Search.complete("User","张三丰").count.should == 0
     end
 
     it "will not faild when title it was nil" do
-      @user = User.create(:email => "zsf@gmail.com", :name => nil, :score => 100, :password => "123456")
+      @user = User.create(email: "zsf@gmail.com", name: nil, score: 100, password: "123456")
       @user.name = "foo"
       @user.save
       Redis::Search.complete("User","foo").count.should == 1
