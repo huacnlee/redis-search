@@ -43,4 +43,23 @@ describe Redis::Search do
       User.count.should == User.redis_search_index_batch_create(1000, true)
     end
   end
+
+  describe 'redis search index type' do
+    after :all do
+      Admin.destroy_all
+      Company.destroy_all
+    end
+
+    it 'use class name for index type' do
+      Admin.create(:email => "zsf@gmail.com", :sex => 1, :name => "张三丰", :alias => ["张三疯","张麻子"], :score => 100, :password => "123456")
+      Redis::Search.complete("User","zsf").count.should == 0
+      Redis::Search.complete("Admin","zsf").count.should == 1
+    end
+
+    it 'allow set index type' do
+      Firm.create(:name => 'Hollywood')
+      Redis::Search.complete('Firm', 'holly').count.should == 0
+      Redis::Search.complete('Company', 'holly').count.should == 1
+    end
+  end
 end
