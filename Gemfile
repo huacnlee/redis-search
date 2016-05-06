@@ -1,12 +1,15 @@
-source "http://rubygems.org"
+source "https://rubygems.org"
+
 gemspec
+
 gem "rake"
+
 group :test do
-  gem 'activesupport',"4.0.0.beta1"
+  gem 'activesupport'
   gem 'redis'
   gem "redis-namespace"
   gem "rmmseg-cpp-huacnlee"
-  gem 'mongoid', :github => "mongoid/mongoid"
+  gem 'mongoid'
   gem 'rspec'
   gem 'mocha'
 end
