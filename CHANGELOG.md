@@ -1,6 +1,6 @@
 ## 1.0.0 / Unreleased
 
--
+- Refactor codes.
 
 ## 0.9.7 / 2014-10-8
 
