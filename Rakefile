@@ -1,5 +1,8 @@
 require 'rake'
 require 'rspec'
+require 'bundler/setup'
+Bundler::GemHelper.install_tasks
+
 require File.expand_path('../spec/spec_helper', __FILE__)
 
 namespace :benchmark do
