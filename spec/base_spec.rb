@@ -22,7 +22,6 @@ describe Redis::Search do
     it 'does defiend class methods [query,complete,split]' do
       Redis::Search.should respond_to(:query)
       Redis::Search.should respond_to(:complete)
-      Redis::Search.should respond_to(:split)
     end
   end
 
@@ -33,24 +32,15 @@ describe Redis::Search do
       @user3 = User.create(email: 'zicheng.lhs@taobao.com', gender: 1, name: '李自成', score: 20, password: 'dsad')
     end
 
-    after :all do
-      User.destroy_all
-    end
-
     it 'User.redis_search_index_batch_create should return indices size' do
       User.count.should == User.redis_search_index_batch_create(1000, true)
     end
   end
 
   describe 'redis search index type' do
-    after :all do
-      Admin.destroy_all
-      Company.destroy_all
-    end
-
     it 'use class name for index type' do
       Admin.create(email: 'zsf@gmail.com', gender: 1, name: '张三丰', alias: %w(张三疯 张麻子), score: 100, password: '123456')
-      Redis::Search.complete('User', 'zsf').count.should == 0
+      Redis::Search.complete('Admin', 'zhangsan').count.should == 1
       Redis::Search.complete('Admin', 'zsf').count.should == 1
     end
 

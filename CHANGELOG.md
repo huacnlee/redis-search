@@ -1,5 +1,11 @@
 ## 1.0.0 / Unreleased
 
+- Remove Segment words search feature (Please use [ElasticSearch](https://www.elastic.co/) or [Solr](http://lucene.apache.org/solr/) instead.), This gem will only prefix search case.
+- Option `prefix_index_enable` removed, not prefix search is only and default.
+- Configuration option `disable_rmmseg` removed.
+- Deprecated `redis_search_index` method, use `redis_search` instead.
+- Removed `Redis::Search.split` method.
+- Add `prefix_match` method into Model of included `Redis::Search`.
 - Refactor codes.
 
 ## 0.9.7 / 2014-10-8

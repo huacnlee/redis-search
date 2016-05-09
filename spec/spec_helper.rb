@@ -9,6 +9,7 @@ require 'redis'
 require 'redis-namespace'
 require 'mocha'
 require 'uri'
+require 'database_cleaner'
 require 'ruby-pinyin'
 
 require 'simplecov'
@@ -80,13 +81,19 @@ end
 
 RSpec.configure do |config|
   config.mock_with :mocha
-  config.after :suite do
+  config.after(:all) do
     keys = $redis.keys('*')
     if keys.length > 1
       keys.each_slice(1000) do |sub_keys|
         $redis.del(*sub_keys)
       end
     end
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.orm = :active_record
+    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner.clean
   end
 end
 

@@ -5,10 +5,6 @@ describe 'Redis::Search indexing' do
     @user = User.create(email: 'zsf@gmail.com', name: '张三丰', score: 100, password: '123456')
   end
 
-  after do
-    User.destroy_all
-  end
-
   describe 'Creating' do
     it 'dose can append index to Redis when use create method' do
       user1 = User.create(email: 'foo@bar.com', name: 'Foo Bar', score: 10)
@@ -50,34 +46,39 @@ describe 'Redis::Search indexing' do
     it 'does can reindex when data changed by update_attributes' do
       Redis::Search.complete('User', '张三丰').count.should == 1
       @user.update_attributes(name: '张无忌')
-      Redis::Search.complete('User', '张三丰').count.should == 0
-      Redis::Search.complete('User', '张无忌').count.should == 1
+      Redis::Search.complete('User', '张三').count.should == 0
+      Redis::Search.complete('User', '张无').count.should == 1
     end
 
     it 'does can reindex when data changed by update_attribute' do
       Redis::Search.complete('User', '张三丰').count.should == 1
       @user.update_attribute(:name, '张无忌')
-      Redis::Search.complete('User', '张三丰').count.should == 0
-      Redis::Search.complete('User', '张无忌').count.should == 1
+      Redis::Search.complete('User', '张三').count.should == 0
+      Redis::Search.complete('User', '张无').count.should == 1
     end
   end
 
   describe 'Deleting' do
     it 'will remove index when deleted by @instance.destroy' do
-      Redis::Search.complete('User', '张三丰').count.should == 1
+      Redis::Search.complete('User', '张三').count.should == 1
       @user.destroy
-      Redis::Search.complete('User', '张三丰').count.should == 0
+      Redis::Search.complete('User', '张三').count.should == 0
     end
 
     it 'will remove index when deleted by Model.destroy_all' do
+      Redis::Search.complete('User', '张').count.should == 1
+      Redis::Search.complete('User', '张三').count.should == 1
       Redis::Search.complete('User', '张三丰').count.should == 1
       User.destroy_all
+      Redis::Search.complete('User', '张').count.should == 0
+      Redis::Search.complete('User', '张三').count.should == 0
       Redis::Search.complete('User', '张三丰').count.should == 0
     end
 
     it 'will remove index when deleted by Model.destroy_all with conditions' do
-      Redis::Search.complete('User', '张三丰').count.should == 1
+      Redis::Search.complete('User', '张三').count.should == 1
       User.where(id: @user.id).destroy_all
+      Redis::Search.complete('User', '张三').count.should == 0
       Redis::Search.complete('User', '张三丰').count.should == 0
     end
 

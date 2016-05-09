@@ -3,7 +3,7 @@ class Redis
   module Search
     class Index
       attr_accessor :type, :title, :id, :score, :aliases, :exts,
-                    :condition_fields, :prefix_index_enable
+                    :condition_fields
 
       class << self
         def redis
@@ -27,20 +27,6 @@ class Redis
           end
         end
 
-        def split_words_for_index(title)
-          words = Search.split(title)
-          if Search.config.pinyin_match
-            # covert Chinese to pinyin to as an index
-            pinyin_full = Search.split_pinyin(title)
-            pinyin_first = pinyin_full.collect { |p| p[0] }.join('')
-            words += pinyin_full
-            words << pinyin_first
-            pinyin_full = nil
-            pinyin_first = nil
-          end
-          words.uniq
-        end
-
         def bm
           t1 = Time.now
           yield
@@ -58,7 +44,6 @@ class Redis
         @condition_fields    = []
         @exts                = []
         @aliases             = []
-        @prefix_index_enable = false
 
         # set attributes value from params
         options.keys.each do |k|
@@ -98,7 +83,7 @@ class Redis
           end
 
           # 建立前缀索引
-          save_prefix_index if prefix_index_enable
+          save_prefix_index
         end
       end
 
@@ -115,7 +100,7 @@ class Redis
           redis.sadd(Search.mk_sets_key(@type, val), @id)
 
           if Search.config.pinyin_match
-            pinyin_full = Search.split_pinyin(val.downcase)
+            pinyin_full = self.class.split_pinyin(val.downcase)
             pinyin_first = pinyin_full.collect { |p| p[0] }.join('')
             pinyin = pinyin_full.join('')
 
@@ -123,10 +108,6 @@ class Redis
             words << pinyin_first
 
             redis.sadd(Search.mk_sets_key(@type, pinyin), @id)
-
-            pinyin_full = nil
-            pinyin_first = nil
-            pinyin = nil
           end
 
           words.each do |word|
@@ -140,6 +121,25 @@ class Redis
 
         redis.zadd(sorted_set_key, sorted_vals)
       end
+
+      def self.split_words_for_index(title)
+        words = title.split('')
+        if Search.config.pinyin_match
+          # covert Chinese to pinyin to as an index
+          pinyin_full = split_pinyin(title)
+          pinyin_first = pinyin_full.collect { |p| p[0] }.join('')
+          words += pinyin_full
+          words << pinyin_first
+        end
+        words.uniq
+      end
+
+      def self.split_pinyin(text)
+        # Pinyin search split as pinyin again
+        pinyin = PinYin.sentence(text)
+        pinyin.split(' ')
+      end
+
     end # end Index
   end
 end

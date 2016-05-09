@@ -2,11 +2,6 @@
 class Redis
   module Search
     class << self
-      # use rmmseg to split words
-      def split(text)
-        _split(text)
-      end
-
       # Use for short title search, this method is search by chars, for example Tag, User, Category ...
       #
       # h3. params:
@@ -98,107 +93,12 @@ class Redis
         hmget(type, ids)
       end
 
-      # Search items, this will split words by Libmmseg
-      #
-      # h3. params:
-      #   type      model name
-      #   text         search text
-      #   :limit    result limit
-      #
-      # h3. usage:
-      # * Redis::Search.query("Tag","Ruby vs Python")
-      #
-      def query(type, text, options = {})
-        tm         = Time.now
-        result     = []
-        limit      = options[:limit] || 10
-        sort_field = options[:sort_field] || 'id'
-        conditions = options[:conditions] || []
+      alias_method :query, :complete
 
-        # 如果搜索文本和查询条件均没有，那就直接返回 []
-        return result if text.strip.blank? && conditions.blank?
-
-        words = split(text)
-        words = words.collect { |w| mk_sets_key(type, w) }
-
-        condition_keys = []
-        unless conditions.blank?
-          conditions = conditions[0] if conditions.is_a?(Array)
-          conditions.keys.each do |c|
-            condition_keys << mk_condition_key(type, c, conditions[c])
-          end
-          # 将条件的 key 放入关键词搜索集合内，用于 sinterstore 搜索
-          words += condition_keys
-        end
-
-        return result if words.blank?
-
-        temp_store_key = "tmpinterstore:#{words.join('+')}"
-
-        if words.length > 1
-          unless config.redis.exists(temp_store_key)
-            config.redis.pipelined do
-              # 将多个词语组合对比，得到交集，并存入临时区域
-              config.redis.sinterstore(temp_store_key, *words)
-              # 将临时搜索设为1天后自动清除
-              config.redis.expire(temp_store_key, 86_400)
-
-              # 拼音搜索
-              if config.pinyin_match
-                pinyin_words = split_pinyin(text)
-                pinyin_words = pinyin_words.collect { |w| mk_sets_key(type, w) }
-                pinyin_words += condition_keys
-                temp_sunion_key = "tmpsunionstore:#{words.join('+')}"
-                temp_pinyin_store_key = "tmpinterstore:#{pinyin_words.join('+')}"
-                # 找出拼音的
-                config.redis.sinterstore(temp_pinyin_store_key, *pinyin_words)
-                # 合并中文和拼音的搜索结果
-                config.redis.sunionstore(temp_sunion_key, *[temp_store_key, temp_pinyin_store_key])
-                # 将临时搜索设为1天后自动清除
-                config.redis.expire(temp_pinyin_store_key, 86_400)
-                config.redis.expire(temp_sunion_key, 86_400)
-              end
-              temp_store_key = temp_sunion_key
-            end
-          end
-        else
-          temp_store_key = words.first
-        end
-
-        # 根据需要的数量取出 ids
-        ids = config.redis.sort(temp_store_key,
-                                limit: [0, limit],
-                                by: mk_score_key(type, '*'),
-                                order: 'desc')
-        result = hmget(type, ids, sort_field: sort_field)
-        info("{#{type} : \"#{text}\"} | Time spend: #{Time.now - tm}s")
-        result
-      end
     end # end class << self
 
-    protected
-
-    def self.split_pinyin(text)
-      # Pinyin search split as pinyin again
-      _split(PinYin.sentence(text))
-    end
 
     private
-
-    def self._split(text)
-      return [] if text.blank?
-      # return chars if disabled rmmseg
-      return text.split('') if Search.config.disable_rmmseg
-
-      algor = RMMSeg::Algorithm.new(text)
-      words = []
-      loop do
-        tok = algor.next_token
-        break if tok.nil?
-        words << tok.text
-      end
-      words
-    end
 
     def self.warn(msg)
       return unless Redis::Search.config.debug

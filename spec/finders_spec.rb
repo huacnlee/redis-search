@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'Redis::Search Finders' do
-  before :all do
+  before do
     @user1 = User.create(email: 'zsf@gmail.com', gender: 1, name: '张三丰', alias: %w(张三疯 张麻子), score: 100, password: '123456')
     @user2 = User.create(email: 'liubei@gmail.com', gender: 2, name: '刘备', score: 200, password: 'abcd')
     @user3 = User.create(email: 'zicheng.lhs@taobao.com', gender: 1, name: '李自成', score: 20, password: 'dsad')
@@ -34,12 +34,6 @@ describe 'Redis::Search Finders' do
                          hits: 762)
   end
 
-  after :all do
-    Post.destroy_all
-    User.destroy_all
-    Category.destroy_all
-  end
-
   describe 'init data should be fine' do
     it 'does users create fine' do
       User.count.should == 6
@@ -59,8 +53,13 @@ describe 'Redis::Search Finders' do
       items = Redis::Search.complete('User', '张')
       items.count.should == 3
 
+      User.prefix_match('张').should == items
+
+      Redis::Search.complete('User', '张').count.should == 3
       Redis::Search.complete('User', '张三').count.should == 1
       Redis::Search.complete('User', '张三丰').count.should == 1
+
+      User.prefix_match('张三').count.should == 1
     end
 
     it 'should search with alias' do
@@ -134,62 +133,6 @@ describe 'Redis::Search Finders' do
       Redis::Search.complete('User', '', conditions: [gender: 1]).count.should == 3
       Redis::Search.complete('User', '', conditions: [gender: 2]).count.should == 2
       Redis::Search.complete('User', '', conditions: [gender: 0]).count.should == 1
-    end
-  end
-
-  describe '[Query] method' do
-    it 'does search with different word combinations' do
-      Redis::Search.query('Post', 'Ruby').count.should == 4
-      Redis::Search.query('Post', 'Ruby on Rails')[0]['title'].should == @post5.title
-      Redis::Search.query('Post', 'Rails Ruby')[0]['title'].should == @post5.title
-    end
-
-    it 'does search with different Chinese word combinations' do
-      Redis::Search.query('Post', '介绍搜索插件').count.should == 1
-      Redis::Search.query('Post', '介绍搜索插件')[0]['title'].should == @post3.title
-      Redis::Search.query('Post', '介绍插件搜索')[0]['title'].should == @post3.title
-      Redis::Search.query('Post', '搜索介绍插件')[0]['title'].should == @post3.title
-      Redis::Search.query('Post', '搜索redis-search介绍插件')[0]['title'].should == @post3.title
-      Redis::Search.query('Post', 'search介绍插件')[0]['title'].should == @post3.title
-      Redis::Search.query('Post', 'Twitter Bootstrap 设计')[0]['title'].should == @post2.title
-      Redis::Search.query('Post', 'Twitter 设计 Bootstrap')[0]['title'].should == @post2.title
-      Redis::Search.query('Post', 'Twitter设计Bootstrap')[0]['title'].should == @post2.title
-    end
-
-    it 'does search Ext field existed.' do
-      Redis::Search.query('Post', 'How do')[0]['category_name'] == @category1.name
-      Redis::Search.query('Post', 'How do')[0]['user_name'] == @user1.name
-    end
-
-    it 'does search with Pinyin' do
-      Redis::Search.query('Post', 'jie shao 搜索')[0]['title'].should == @post3.title
-      Redis::Search.query('Post', 'redis搜索jie shao')[0]['title'].should == @post3.title
-      Redis::Search.query('Post', 'ruby 插件搜索redis jie shao')[0]['title'].should == @post3.title
-      Redis::Search.query('Post', 'jie')[0]['title'].should == @post3.title
-    end
-
-    it 'does search with a conditions' do
-      Redis::Search.query('Post', 'Ruby', conditions: [user_id: @user3.id]).count.should == 1
-      Redis::Search.query('Post', 'Ruby on Rails', conditions: [user_id: @user3.id]).count.should == 0
-    end
-
-    it 'does search with more conditions' do
-      Redis::Search.query('Post', '', conditions: [user_id: @user3.id, category_id: @category1.id]).count.should == 1
-      Redis::Search.query('Post', 'Ruby', conditions: [user_id: @user3.id, category_id: @category1.id]).count.should == 1
-      Redis::Search.query('Post', 'Ruby', conditions: [user_id: @user3.id, category_id: @category2.id]).count.should == 0
-    end
-
-    it 'does search only by conditions' do
-      Redis::Search.query('Post', '', conditions: [user_id: @user3.id]).count.should == 2
-      Redis::Search.query('Post', '', conditions: [category_id: @category2.id]).count.should == 1
-    end
-  end
-
-  describe 'Segment words' do
-    it 'does split words method can work fine.' do
-      Redis::Search.split(nil).should == []
-      Redis::Search.split('Ruby on Rails').should == %w(Ruby on Rails)
-      Redis::Search.split('如何掌控自己的学习和生活').collect { |t| t.force_encoding('utf-8') }.should == %w(如何 掌控 自己 的 学习 和 生活)
     end
   end
 end

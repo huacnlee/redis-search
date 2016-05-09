@@ -38,8 +38,7 @@ class Redis
         exts: redis_search_fields_to_hash(redis_search_options[:ext_fields]),
         type: redis_search_options[:class_name] || self.class.name,
         condition_fields: redis_search_options[:condition_fields],
-        score: send(redis_search_options[:score_field]).to_i,
-        prefix_index_enable: redis_search_options[:prefix_index_enable]
+        score: send(redis_search_options[:score_field]).to_i
       }
 
       s = Search::Index.new(opts)
@@ -114,13 +113,11 @@ class Redis
       # == Params:
       #   title_field   Query field for Search
       #   alias_field   Alias field for search, can accept multi field (String or Array type) it type is String, redis-search will split by comma
-      #   prefix_index_enable   Is use prefix index search
       #   ext_fields    What kind fields do you need inlucde to search indexes
       #   score_field   Give a score for search sort, need Integer value, default is `created_at`
-      def redis_search_index(opts = {})
+      def redis_search(opts = {})
         opts[:title_field] ||= :title
         opts[:alias_field] ||= nil
-        opts[:prefix_index_enable] ||= false
         opts[:ext_fields] ||= []
         opts[:score_field] ||= :created_at
         opts[:condition_fields] ||= []
@@ -137,6 +134,15 @@ class Redis
         Search.indexed_models << self
 
         class_variable_set('@@redis_search_options'.freeze, opts)
+      end
+
+      def redis_search_index(opts = {})
+        Kernel.warn 'DEPRECATION WARNING: redis_search_index is deprecated, use redis_search instead. '
+        redis_search(opts)
+      end
+
+      def prefix_match(q, opts = {})
+        Redis::Search.complete(self.name, q, opts)
       end
 
       def redis_search_index_batch_create(batch_size = 1000, progressbar = false)

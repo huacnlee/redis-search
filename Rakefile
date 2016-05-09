@@ -46,7 +46,6 @@ namespace :benchmark do
     Redis::Search::Index.new(type: 'CategoryTest',
                              title: random.next,
                              id: 0,
-                             prefix_index_enable: true,
                              score: 1).save
 
     Benchmark.bm do |bm|
@@ -55,7 +54,6 @@ namespace :benchmark do
           Redis::Search::Index.new(type: 'CategoryTest',
                                    title: random.next,
                                    id: i,
-                                   prefix_index_enable: true,
                                    score: 1).save
         end
       end

@@ -13,7 +13,7 @@ High performance real-time search (Support Chinese), index in Redis for Rails ap
 
 * Real-time search
 * High performance
-* Segment words search and prefix match search
+* Prefix match search
 * Support match with alias
 * Support ActiveRecord and Mongoid
 * Sort results by one field
@@ -54,8 +54,6 @@ Redis::Search.configure do |config|
   config.redis = redis
   config.complete_max_length = 100
   config.pinyin_match = true
-  # use rmmseg, true to disable it, it can save memroy
-  config.disable_rmmseg = false
 end
 ```
 
@@ -70,10 +68,10 @@ class Post < ActiveRecord::Base
   belongs_to :user
   belongs_to :category
 
-  redis_search_index(title_field: :title,
-                     score_field: :hits,
-                     condition_fields: [:user_id, :category_id],
-                     ext_fields: [:category_name])
+  redis_search title_field: :title,
+               score_field: :hits,
+               condition_fields: [:user_id, :category_id],
+               ext_fields: [:category_name]
 
   def category_name
     self.category.name
@@ -87,24 +85,18 @@ class User < ActiveRecord::Base
 
   serialize :alias_names, Array
 
-  redis_search_index(title_field: :name,
-                     alias_field: :alias_names,
-                     prefix_index_enable: true,
-                     score_field: :followers_count,
-                     ext_fields: [:email, :tagline])
+  redis_search title_field: :name,
+               alias_field: :alias_names,
+               score_field: :followers_count,
+               ext_fields: [:email, :tagline]
 end
 ```
 
 ```ruby
 class SearchController < ApplicationController
-  # GET /searchs?q=title
-  def index
-    Redis::Search.query("Post", params[:q], conditions: { user_id: 12 })
-  end
-
   # GET /search_users?q=j
   def search_users
-    Redis::Search.complete("Post", params[:q], conditions: { user_id: 12, category_id: 4 })
+    Post.prefix_match(params[:q], conditions: { user_id: 12, category_id: 4 })
   end
 end
 ```

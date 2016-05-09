@@ -5,12 +5,6 @@ class Redis
 
       def configure
         yield @config ||= Config.new
-
-        unless @config.disable_rmmseg
-          require 'rmmseg'
-          # loading RMMSeg chinese word dicts.
-          RMMSeg::Dictionary.load_dictionaries
-        end
       end
     end
 
@@ -29,15 +23,12 @@ class Redis
       # When you search "de" will -> 得|的|德...
       # When you search "得" will -> "de" -> 得|的|德...
       attr_accessor :pinyin_match
-      # Disable RMMSeg, if you don't need, disable this will save memory. (true|false) default = true
-      attr_accessor :disable_rmmseg
 
       def initialize
         @debug               = false
         @redis               = nil
         @complete_max_length = 100
         @pinyin_match        = false
-        @disable_rmmseg      = false
       end
     end
   end
