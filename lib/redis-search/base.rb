@@ -3,6 +3,8 @@ class Redis
   module Search
     autoload :PinYin, 'ruby-pinyin'
 
+    DOT = '.'.freeze
+
     extend ActiveSupport::Concern
 
     included do
@@ -149,25 +151,29 @@ class Redis
         count = 0
         if ancestors.collect(&:to_s).include?('ActiveRecord::Base'.freeze)
           find_in_batches(batch_size: batch_size) do |items|
-            items.each do |item|
-              item.redis_search_index_create
-              count += 1
-              print '.' if progressbar
-            end
+            _redis_search_reindex_items(items)
           end
         elsif included_modules.collect(&:to_s).include?('Mongoid::Document'.freeze)
           all.each_slice(batch_size) do |items|
-            items.each do |item|
-              item.redis_search_index_create
-              count += 1
-              print '.' if progressbar
-            end
+            _redis_search_reindex_items(items)
           end
         else
           puts 'skiped, not support this ORM in current.'
         end
 
         count
+      end
+
+      private
+
+      def _redis_search_reindex_items(items)
+        items.each do |item|
+          item.redis_search_index_create
+          count += 1
+          print DOT if progressbar
+          item = nil
+        end
+        items = nil
       end
     end
   end
