@@ -1,15 +1,13 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 gemspec
 
-gem "rake"
+gem 'rails'
 
 group :test do
-  gem 'activesupport'
-  gem 'redis'
-  gem "redis-namespace"
-  gem "rmmseg-cpp-huacnlee"
-  gem 'mongoid'
+  gem 'sqlite3'
   gem 'rspec'
   gem 'mocha'
+  gem 'simplecov'
+  gem 'codecov'
 end

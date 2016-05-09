@@ -1,4 +1,3 @@
-# coding: utf-8
 class Redis
   module Search
     class << self
@@ -7,8 +6,8 @@ class Redis
       def configure
         yield @config ||= Config.new
 
-        if not @config.disable_rmmseg
-          require "rmmseg"
+        unless @config.disable_rmmseg
+          require 'rmmseg'
           # loading RMMSeg chinese word dicts.
           RMMSeg::Dictionary.load_dictionaries
         end

@@ -1,5 +1,5 @@
-# coding: utf-8
-require "redis-search"
+require 'redis-search'
+
 namespace :redis_search do
   task index: 'index:all'
 
@@ -27,18 +27,18 @@ namespace :redis_search do
     desc index_model_desc
     task model: :environment do
       if ENV['CLASS'].to_s == ''
-        puts '='*90, 'USAGE', '='*90, index_model_desc, ""
+        puts '=' * 90, 'USAGE', '=' * 90, index_model_desc, ''
         exit(1)
       end
 
       klass = eval(ENV['CLASS'].to_s)
       batch = ENV['BATCH'].to_i > 0 ? ENV['BATCH'].to_i : 1000
       tm    = Time.now
-      puts "Redis-Search index data to Redis from [#{klass.to_s}]"
+      puts "Redis-Search index data to Redis from [#{klass}]"
       count = klass.redis_search_index_batch_create(batch, true)
-      puts ""
+      puts ''
       puts "Indexed #{count} rows  |  Time spend: #{(Time.now - tm)}s"
-      puts "Rebuild Index done."
+      puts 'Rebuild Index done.'
     end
 
     desc index_all_desc
@@ -51,23 +51,23 @@ namespace :redis_search do
       Dir.glob(File.join("#{dir}/**/*.rb")).each do |path|
         model_filename = path[/#{Regexp.escape(dir.to_s)}\/([^\.]+).rb/, 1]
 
-        next if model_filename.match(/^concerns\//i) # Skip concerns/ folder
+        next if model_filename =~ /^concerns\//i # Skip concerns/ folder
 
         begin
           klass = model_filename.camelize.constantize
         rescue NameError
-          require(path) ? retry : raise(RuntimeError, "Cannot load class '#{klass}'")
+          require(path) ? retry : raise("Cannot load class '#{klass}'")
         end
       end
 
       puts "Redis-Search index data to Redis from [#{dir}]"
       Redis::Search.indexed_models.each do |klass|
-        puts "[#{klass.to_s}]"
+        puts "[#{klass}]"
         count += klass.redis_search_index_batch_create(batch, true)
-        puts ""
+        puts ''
       end
       puts "Indexed #{count} rows  |  Time spend: #{(Time.now - tm)}s"
-      puts "Rebuild Index done."
+      puts 'Rebuild Index done.'
     end
   end
 end

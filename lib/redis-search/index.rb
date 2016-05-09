@@ -2,7 +2,8 @@
 class Redis
   module Search
     class Index
-      attr_accessor :type, :title, :id, :score, :aliases, :exts, :condition_fields, :prefix_index_enable
+      attr_accessor :type, :title, :id, :score, :aliases, :exts,
+                    :condition_fields, :prefix_index_enable
 
       class << self
         def redis
@@ -12,17 +13,17 @@ class Redis
         def remove(options = {})
           type = options[:type]
 
-          self.redis.pipelined do
-            self.redis.hdel(type,options[:id])
-            self.redis.del(Search.mk_score_key(type,options[:id]))
+          redis.pipelined do
+            redis.hdel(type, options[:id])
+            redis.del(Search.mk_score_key(type, options[:id]))
 
-            words = self.split_words_for_index(options[:title])
+            words = split_words_for_index(options[:title])
             words.each do |word|
-              self.redis.srem(Search.mk_sets_key(type,word), options[:id])
+              redis.srem(Search.mk_sets_key(type, word), options[:id])
             end
 
             # remove set for prefix index key
-            self.redis.srem(Search.mk_sets_key(type,options[:title]),options[:id])
+            redis.srem(Search.mk_sets_key(type, options[:title]), options[:id])
           end
         end
 
@@ -31,7 +32,7 @@ class Redis
           if Search.config.pinyin_match
             # covert Chinese to pinyin to as an index
             pinyin_full = Search.split_pinyin(title)
-            pinyin_first = pinyin_full.collect { |p| p[0] }.join("")
+            pinyin_first = pinyin_full.collect { |p| p[0] }.join('')
             words += pinyin_full
             words << pinyin_first
             pinyin_full = nil
@@ -61,38 +62,38 @@ class Redis
 
         # set attributes value from params
         options.keys.each do |k|
-          self.send("#{k}=", options[k])
+          send("#{k}=", options[k])
         end
-        @aliases << self.title
+        @aliases << title
         @aliases.uniq!
       end
 
       def save
         return if @title.blank?
 
-        self.redis.pipelined do
-          data = {title: @title, id: @id, type: @type}
-          self.exts.each do |f|
+        redis.pipelined do
+          data = { title: @title, id: @id, type: @type }
+          exts.each do |f|
             data[f[0]] = f[1]
           end
 
           # 将原始数据存入 hashes
-          res = self.redis.hset(@type, @id, data.to_json)
+          res = redis.hset(@type, @id, data.to_json)
 
           # 将目前的编号保存到条件(conditions)字段所创立的索引上面
-          self.condition_fields.each do |field|
-            self.redis.sadd(Search.mk_condition_key(@type,field,data[field.to_sym]), @id)
+          condition_fields.each do |field|
+            redis.sadd(Search.mk_condition_key(@type, field, data[field.to_sym]), @id)
           end
 
           # score for search sort
-          self.redis.set(Search.mk_score_key(@type,@id),@score)
+          redis.set(Search.mk_score_key(@type, @id), @score)
 
           # 保存 sets 索引，以分词的单词为key，用于后面搜索，里面存储 ids
-          self.aliases.each do |val|
+          aliases.each do |val|
             words = Search::Index.split_words_for_index(val)
             next if words.blank?
             words.each do |word|
-              self.redis.sadd(Search.mk_sets_key(@type,word), @id)
+              redis.sadd(Search.mk_sets_key(@type, word), @id)
             end
           end
 
@@ -102,25 +103,26 @@ class Redis
       end
 
       private
+
       def save_prefix_index
         sorted_set_key = Search.mk_complete_key(@type)
         sorted_vals = []
 
-        self.aliases.each do |val|
+        aliases.each do |val|
           words = []
           words << val.downcase
 
-          self.redis.sadd(Search.mk_sets_key(@type,val), @id)
+          redis.sadd(Search.mk_sets_key(@type, val), @id)
 
           if Search.config.pinyin_match
             pinyin_full = Search.split_pinyin(val.downcase)
-            pinyin_first = pinyin_full.collect { |p| p[0] }.join("")
-            pinyin = pinyin_full.join("")
+            pinyin_first = pinyin_full.collect { |p| p[0] }.join('')
+            pinyin = pinyin_full.join('')
 
             words << pinyin
             words << pinyin_first
 
-            self.redis.sadd(Search.mk_sets_key(@type,pinyin), @id)
+            redis.sadd(Search.mk_sets_key(@type, pinyin), @id)
 
             pinyin_full = nil
             pinyin_first = nil
@@ -136,9 +138,8 @@ class Redis
           end
         end
 
-        self.redis.zadd(sorted_set_key, sorted_vals)
+        redis.zadd(sorted_set_key, sorted_vals)
       end
-
     end # end Index
   end
 end
