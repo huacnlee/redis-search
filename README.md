@@ -1,6 +1,6 @@
 # Redis-Search
 
-High performance real-time search (Support Chinese), index in Redis for Rails application
+High performance real-time prefix search, indexes store in Redis for Rails application.
 
 [中文介绍和使用说明](https://github.com/huacnlee/redis-search/wiki/Usage-in-Chinese)
 
