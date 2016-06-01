@@ -31,13 +31,13 @@ namespace :redis_search do
         exit(1)
       end
 
-      klass = eval(ENV['CLASS'].to_s)
-      batch = ENV['BATCH'].to_i > 0 ? ENV['BATCH'].to_i : 1000
-      tm    = Time.now
+      klass = Object.const_get((ENV['CLASS'].to_s)
+      batch = ENV['BATCH'].to_i || 1000
+      start = Time.now
       puts "Redis-Search index data to Redis from [#{klass}]"
       count = klass.redis_search_index_batch_create(batch, true)
       puts ''
-      puts "Indexed #{count} rows  |  Time spend: #{(Time.now - tm)}s"
+      puts "Indexed #{count} rows  |  Time spend: #{(Time.now - start)}s"
       puts 'Rebuild Index done.'
     end
 
