@@ -102,11 +102,18 @@ describe 'Redis::Search Finders' do
       item['score'].should == @user1.score
     end
 
-    it 'does can return right order' do
+    it 'does can return desc order' do
       items = Redis::Search.complete('User', 'z')
       items[0]['id'].should == @user4.id
       items[1]['id'].should == @user5.id
       items[2]['id'].should == @user1.id
+    end
+
+    it 'does can return asc order' do
+      items = Redis::Search.complete('User', 'z', order: 'asc')
+      items[0]['id'].should == @user1.id
+      items[1]['id'].should == @user5.id
+      items[2]['id'].should == @user4.id
     end
 
     it 'does support English' do

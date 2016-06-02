@@ -8,6 +8,7 @@ class Redis
       #   type      model name
       #   w         search char
       #   :limit    result limit
+      #   :order    result order
       #
       # h3. usage:
       #
@@ -18,6 +19,7 @@ class Redis
       def complete(type, w, options = {})
         limit      = options[:limit] || 10
         conditions = options[:conditions] || []
+        order      = options[:order] || 'desc'
         return [] if (w.blank? && conditions.blank?) || type.blank?
 
         prefix_matchs = []
@@ -88,7 +90,7 @@ class Redis
         ids = config.redis.sort(temp_store_key,
                                 limit: [0, limit],
                                 by: mk_score_key(type, '*'),
-                                order: 'desc')
+                                order: order)
         return [] if ids.blank?
         hmget(type, ids)
       end
