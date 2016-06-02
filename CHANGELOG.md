@@ -1,4 +1,4 @@
-## 1.0.0 / Unreleased
+## 1.0.0 / 2016-06-02
 
 - Remove Segment words search feature (Please use [ElasticSearch](https://www.elastic.co/) or [Solr](http://lucene.apache.org/solr/) instead.), This gem will only prefix search case.
 - Option `prefix_index_enable` removed, not prefix search is only and default.
