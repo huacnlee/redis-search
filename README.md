@@ -151,6 +151,7 @@ Projects used redis-search:
 
 - [redis-search-example](https://github.com/huacnlee/redis-search-example) - An example for show you how to use redis-search.
 - [IMAX.im](https://github.com/huacnlee/imax.im)
+- [Ruby China](https://ruby-china.org) - Use for mention autocomplete.
 
 ## License
 
