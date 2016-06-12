@@ -2,6 +2,10 @@
 
 - Fix Rake tasks error.
 
+**Break changes**
+
+- `redis_search_index_batch_create` method now accept 1 arg.
+
 ## 1.0.1 / 2016-06-12
 
 - Remove Segment words search feature (Please use [ElasticSearch](https://www.elastic.co/) or [Solr](http://lucene.apache.org/solr/) instead.), This gem will only prefix search case.

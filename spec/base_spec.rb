@@ -33,7 +33,7 @@ describe Redis::Search do
     end
 
     it 'User.redis_search_index_batch_create should return indices size' do
-      User.count.should == User.redis_search_index_batch_create(1000, true)
+      User.count.should == User.redis_search_index_batch_create(1000)
     end
   end
 
