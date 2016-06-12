@@ -31,7 +31,7 @@ namespace :redis_search do
         exit(1)
       end
 
-      klass = Object.const_get((ENV['CLASS'].to_s)
+      klass = Object.const_get(ENV['CLASS'].to_s)
       batch = ENV['BATCH'].to_i || 1000
       start = Time.now
       puts "Redis-Search index data to Redis from [#{klass}]"
