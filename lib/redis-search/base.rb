@@ -147,15 +147,17 @@ class Redis
         Redis::Search.complete(self.name, q, opts)
       end
 
-      def redis_search_index_batch_create(batch_size = 1000, progressbar = false)
+      def redis_search_index_batch_create(batch_size = 1000)
         count = 0
         if ancestors.collect(&:to_s).include?('ActiveRecord::Base'.freeze)
           find_in_batches(batch_size: batch_size) do |items|
             _redis_search_reindex_items(items)
+            count += item.count
           end
         elsif included_modules.collect(&:to_s).include?('Mongoid::Document'.freeze)
-          all.each_slice(batch_size) do |items|
+          self.all.each_slice(batch_size) do |items|
             _redis_search_reindex_items(items)
+            count += item.count
           end
         else
           puts 'skiped, not support this ORM in current.'
@@ -169,8 +171,7 @@ class Redis
       def _redis_search_reindex_items(items)
         items.each do |item|
           item.redis_search_index_create
-          count += 1
-          print DOT if progressbar
+          print DOT
           item = nil
         end
         items = nil

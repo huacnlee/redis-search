@@ -1,3 +1,7 @@
+## 1.0.2 / 2016-06-12
+
+- Fix Rake tasks error.
+
 ## 1.0.1 / 2016-06-12
 
 - Remove Segment words search feature (Please use [ElasticSearch](https://www.elastic.co/) or [Solr](http://lucene.apache.org/solr/) instead.), This gem will only prefix search case.

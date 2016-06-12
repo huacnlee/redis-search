@@ -32,10 +32,10 @@ namespace :redis_search do
       end
 
       klass = Object.const_get(ENV['CLASS'].to_s)
-      batch = ENV['BATCH'].to_i || 1000
+      batch = ENV['BATCH'].to_i > 0 ? ENV['BATCH'].to_i : 1000
       start = Time.now
       puts "Redis-Search index data to Redis from [#{klass}]"
-      count = klass.redis_search_index_batch_create(batch, true)
+      count = klass.redis_search_index_batch_create(batch)
       puts ''
       puts "Indexed #{count} rows  |  Time spend: #{(Time.now - start)}s"
       puts 'Rebuild Index done.'
@@ -63,7 +63,7 @@ namespace :redis_search do
       puts "Redis-Search index data to Redis from [#{dir}]"
       Redis::Search.indexed_models.each do |klass|
         puts "[#{klass}]"
-        count += klass.redis_search_index_batch_create(batch, true)
+        count += klass.redis_search_index_batch_create(batch)
         puts ''
       end
       puts "Indexed #{count} rows  |  Time spend: #{(Time.now - tm)}s"
