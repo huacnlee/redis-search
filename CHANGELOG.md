@@ -1,3 +1,7 @@
+## 1.0.3 / 2016-07-26
+
+- Fix rake task bug. !54
+
 ## 1.0.2 / 2016-06-12
 
 - Fix Rake tasks error.
