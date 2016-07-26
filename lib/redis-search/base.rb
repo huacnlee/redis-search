@@ -152,12 +152,12 @@ class Redis
         if ancestors.collect(&:to_s).include?('ActiveRecord::Base'.freeze)
           find_in_batches(batch_size: batch_size) do |items|
             _redis_search_reindex_items(items)
-            count += item.count
+            count += items.count
           end
         elsif included_modules.collect(&:to_s).include?('Mongoid::Document'.freeze)
           self.all.each_slice(batch_size) do |items|
             _redis_search_reindex_items(items)
-            count += item.count
+            count += items.count
           end
         else
           puts 'skiped, not support this ORM in current.'

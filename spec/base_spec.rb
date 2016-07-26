@@ -26,14 +26,15 @@ describe Redis::Search do
   end
 
   describe 'Redis::Search ClassMethods module' do
-    before :all do
+    let :users do
       @user1 = User.create(email: 'zsf@gmail.com', gender: 1, name: '张三丰', alias: %w(张三疯 张麻子), score: 100, password: '123456')
       @user2 = User.create(email: 'liubei@gmail.com', gender: 2, name: '刘备', score: 200, password: 'abcd')
       @user3 = User.create(email: 'zicheng.lhs@taobao.com', gender: 1, name: '李自成', score: 20, password: 'dsad')
+      User.all
     end
 
     it 'User.redis_search_index_batch_create should return indices size' do
-      User.count.should == User.redis_search_index_batch_create(1000)
+      3 == users.redis_search_index_batch_create(1000)
     end
   end
 
