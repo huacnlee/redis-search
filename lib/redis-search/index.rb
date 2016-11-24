@@ -46,7 +46,7 @@ class Redis
         @aliases             = []
 
         # set attributes value from params
-        options.keys.each do |k|
+        options.each_key do |k|
           send("#{k}=", options[k])
         end
         @aliases << title

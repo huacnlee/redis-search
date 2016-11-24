@@ -58,7 +58,7 @@ class Redis
         condition_keys = []
         unless conditions.blank?
           conditions = conditions[0] if conditions.is_a?(Array)
-          conditions.keys.each do |c|
+          conditions.each_key do |c|
             condition_keys << mk_condition_key(type, c, conditions[c])
           end
         end
