@@ -1,6 +1,15 @@
-# Redis-Search
+# Redis-Search (Deprecated! 不在维护!)
 
 High performance real-time prefix search, indexes store in Redis for Rails application.
+
+## NOTE!
+
+There have more better ways you can choice! 
+
+下面的两种方式将是更好的选择：
+
+- [Elasticsearch Prefix Query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)
+- [PostgreSQL Prefix Search](https://github.com/Casecommons/pg_search#prefix-postgresql-84-and-newer-only)
 
 [中文介绍和使用说明](https://github.com/huacnlee/redis-search/wiki/Usage-in-Chinese)
 
