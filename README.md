@@ -1,6 +1,6 @@
 # Redis-Search (Deprecated! 不在维护!)
 
-High performance real-time prefix search, indexes store in Redis for Rails application.
+High performance real-time prefix search, indexes store in Redis for Rails application. [中文介绍和使用说明](https://github.com/huacnlee/redis-search/wiki/Usage-in-Chinese)
 
 ## NOTE!
 
@@ -11,12 +11,9 @@ There have more better ways you can choice!
 - [Elasticsearch Prefix Query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html)
 - [PostgreSQL Prefix Search](https://github.com/Casecommons/pg_search#prefix-postgresql-84-and-newer-only)
 
-[中文介绍和使用说明](https://github.com/huacnlee/redis-search/wiki/Usage-in-Chinese)
-
 ## Master Status
 
 [![Gem Version](https://badge.fury.io/rb/redis-search.svg)](https://badge.fury.io/rb/redis-search) [![CI Status](https://secure.travis-ci.org/huacnlee/redis-search.svg)](http://travis-ci.org/huacnlee/redis-search) [![CodeCov](https://codecov.io/gh/huacnlee/redis-search/branch/master/graph/badge.svg)](https://codecov.io/gh/huacnlee/redis-search)
-
 
 ## Features
 
